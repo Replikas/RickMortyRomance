@@ -128,38 +128,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   });
 
   const handleSave = async () => {
-    try {
-      saveSettingsMutation.mutate(settings);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-      }
-      
-      const updatedGameState = await response.json();
-      
-      setGameState(updatedGameState);
-      // Force reload settings from the updated game state
-      setSettings({ ...defaultSettings, ...updatedGameState.settings });
-      setHasChanges(false);
-      
-      toast({
-        title: "Settings Saved",
-        description: "Your preferences have been saved successfully.",
-      });
-      
-      // Invalidate relevant caches
-      queryClient.invalidateQueries({ queryKey: ['/api/game-states'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/game-state', currentUser?.id, gameState.characterId] });
-      
-    } catch (error: any) {
-      console.error("Settings save error:", error);
-      toast({
-        title: "Save Failed",
-        description: error.message || "Failed to save settings. Please try again.",
-        variant: "destructive",
-      });
-    }
+    saveSettingsMutation.mutate(settings);
   };
 
   // Profile picture functionality removed for Render compatibility
