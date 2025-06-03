@@ -254,11 +254,11 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-4xl mx-auto h-full">
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6 h-full min-h-[calc(100vh-2rem)]">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 h-full min-h-[calc(100vh-2rem)]">
           
           {/* Character Panel - Mobile: Top, Desktop: Left */}
           <motion.div 
-            className="lg:col-span-1 order-1 lg:order-1 space-y-4 sm:space-y-6"
+            className="lg:col-span-1 order-1 lg:order-1 space-y-3 sm:space-y-4"
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -457,23 +457,23 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
 
           {/* Dialogue and Interaction Area - Mobile: Bottom, Desktop: Right */}
           <motion.div 
-            className="lg:col-span-2 order-2 lg:order-2 space-y-4 sm:space-y-6 flex-1 flex flex-col"
+            className="lg:col-span-2 order-2 lg:order-2 space-y-3 sm:space-y-4 flex-1 flex flex-col"
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             
-            {/* Dialogue History */}
+            {/* Dialogue History - Compact */}
             <Card className="glass-morphism portal-glow flex-1 flex flex-col">
-              <CardHeader className="pb-2 sm:pb-4">
-                <CardTitle className="flex items-center justify-between text-glow text-base sm:text-lg">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between text-glow text-sm">
                   <div className="flex items-center">
-                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-secondary-foreground" />
-                    Interdimensional Chat
+                    <MessageSquare className="w-4 h-4 mr-2 text-secondary-foreground" />
+                    Chat
                   </div>
                   {/* NSFW Toggle */}
                   <div className="flex items-center space-x-2">
-                    <span className={`text-xs font-medium transition-colors ${
+                    <span className={`text-xs transition-colors ${
                       currentGameState?.settings?.nsfwContent ? 'text-muted-foreground' : 'text-green-400'
                     }`}>
                       SFW
@@ -508,7 +508,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                       }}
                       className="data-[state=checked]:bg-red-500 data-[state=unchecked]:bg-green-500"
                     />
-                    <span className={`text-xs font-medium transition-colors ${
+                    <span className={`text-xs transition-colors ${
                       currentGameState?.settings?.nsfwContent ? 'text-red-400' : 'text-muted-foreground'
                     }`}>
                       NSFW
@@ -516,7 +516,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col min-h-0">
+              <CardContent className="flex-1 flex flex-col min-h-0 pb-2">
                 <DialogueBox 
                   dialogues={dialogues || []}
                   character={selectedCharacter}
@@ -526,37 +526,12 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
               </CardContent>
             </Card>
 
-            {/* Choice Buttons */}
+            {/* Custom Message Input - Moved Above Choices */}
             <Card className="glass-morphism portal-glow">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-glow">
-                  Response Options
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div id="choice-buttons" className="relative">
-                  <ChoiceButtons 
-                    character={selectedCharacter}
-                    onChoiceSelect={handleChoiceSelect}
-                    disabled={isTyping || conversationMutation.isPending}
-                    conversationHistory={dialogues || []}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Custom Message Input */}
-            <Card className="glass-morphism portal-glow">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-glow">
-                  Custom Response
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <div className="w-4 h-4 flex items-center justify-center">⌨️</div>
-                    <span>Or type your own response:</span>
+              <CardContent className="p-3">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-xs text-muted-foreground mb-2">
+                    <span>Type your response:</span>
                   </div>
                   
                   <div className="relative">
@@ -569,30 +544,46 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                           handleCustomMessage();
                         }
                       }}
-                      className="w-full glass-morphism border-2 border-border/30 rounded-lg p-4 text-foreground placeholder-muted-foreground focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-300 resize-none"
-                      rows={3}
+                      className="w-full glass-morphism border border-border/30 rounded-lg p-3 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 focus:outline-none transition-all duration-300 resize-none"
+                      rows={2}
                       placeholder="Type your custom response here..."
                       maxLength={200}
                       disabled={isTyping || conversationMutation.isPending}
                     />
                     
-                    <div className="absolute bottom-3 right-3 flex items-center space-x-3">
+                    <div className="absolute bottom-2 right-2 flex items-center space-x-2">
                       <span className="text-xs text-muted-foreground">
                         {customMessage.length}/200
                       </span>
                       <Button
                         onClick={handleCustomMessage}
                         disabled={!customMessage.trim() || isTyping || conversationMutation.isPending}
-                        className="btn-portal mobile-touch-target"
+                        className="btn-portal"
                         size="sm"
                       >
-                        <div className="flex items-center space-x-2">
-                          <span>Send</span>
-                          <div className="w-4 h-4 flex items-center justify-center">📤</div>
-                        </div>
+                        Send
                       </Button>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Choice Buttons - Now Below Custom Input */}
+            <Card className="glass-morphism portal-glow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-glow">
+                  Quick Responses
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div id="choice-buttons" className="relative">
+                  <ChoiceButtons 
+                    character={selectedCharacter}
+                    onChoiceSelect={handleChoiceSelect}
+                    disabled={isTyping || conversationMutation.isPending}
+                    conversationHistory={dialogues || []}
+                  />
                 </div>
               </CardContent>
             </Card>

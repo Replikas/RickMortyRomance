@@ -77,7 +77,7 @@ export default function DialogueBox({
 
   if (isLoading) {
     return (
-      <div className="h-80 lg:h-96 xl:h-[500px] flex items-center justify-center">
+      <div className="h-60 lg:h-64 xl:h-72 flex items-center justify-center">
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -109,7 +109,7 @@ export default function DialogueBox({
     <div className="relative">
       <ScrollArea 
         ref={scrollAreaRef}
-        className="h-80 lg:h-96 xl:h-[500px] pr-4"
+        className="h-60 lg:h-64 xl:h-72 pr-4"
       >
         <div className="space-y-4">
           {dialogues.length === 0 ? (
