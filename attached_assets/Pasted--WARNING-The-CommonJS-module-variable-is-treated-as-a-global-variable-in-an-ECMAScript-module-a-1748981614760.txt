@@ -1,0 +1,85 @@
+▲ [WARNING] The CommonJS "module" variable is treated as a global variable in an ECMAScript module and may not work as expected [commonjs-variable-in-esm]
+
+    ping-service.js:140:0:
+      140 │ module.exports = RenderPingService;
+          ╵ ~~~~~~
+
+  This file is considered to be an ECMAScript module because the enclosing "package.json" file sets the type of this file to "module":
+
+    package.json:4:10:
+      4 │   "type": "module",
+        ╵           ~~~~~~~~
+
+  Node's package format requires that CommonJS files in a "type": "module" package use the ".cjs" file extension.
+
+
+1 warning
+
+  dist/index.js  66.3kb
+
+⚡ Done in 6ms
+
+[6/6] RUN npm run build  ✔ 5s
+
+exporting to docker image format
+
+exporting to image
+
+importing to docker
+
+[auth] sharing credentials for production-europe-west4-drams3a.railway-registry.com
+
+[auth] sharing credentials for production-europe-west4-drams3a.railway-registry.com  ✔ 0ms
+
+importing to docker  ✔ 8s
+
+Build time: 45.66 seconds
+
+ 
+
+====================
+
+Starting Healthcheck
+
+====================
+
+
+Path: /health
+
+Retry window: 5m0s
+
+ 
+
+Attempt #1 failed with service unavailable. Continuing to retry for 4m58s
+
+Attempt #2 failed with service unavailable. Continuing to retry for 4m53s
+
+Attempt #3 failed with service unavailable. Continuing to retry for 4m41s
+
+Attempt #4 failed with service unavailable. Continuing to retry for 4m36s
+
+Attempt #5 failed with service unavailable. Continuing to retry for 4m28s
+
+Attempt #6 failed with service unavailable. Continuing to retry for 4m11s
+
+Attempt #7 failed with service unavailable. Continuing to retry for 3m41s
+
+Attempt #8 failed with service unavailable. Continuing to retry for 3m10s
+
+Attempt #9 failed with service unavailable. Continuing to retry for 2m40s
+
+Attempt #10 failed with service unavailable. Continuing to retry for 2m9s
+
+Attempt #11 failed with service unavailable. Continuing to retry for 1m39s
+
+Attempt #12 failed with service unavailable. Continuing to retry for 1m8s
+
+Attempt #13 failed with service unavailable. Continuing to retry for 38s
+
+Attempt #14 failed with service unavailable. Continuing to retry for 7s
+
+ 
+
+1/1 replicas never became healthy!
+
+Healthcheck failed!

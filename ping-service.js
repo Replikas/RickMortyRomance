@@ -137,4 +137,4 @@ if (process.env.NODE_ENV === 'production') {
   process.on('SIGINT', () => pingService.stop());
 }
 
-module.exports = RenderPingService;
+export default RenderPingService;
