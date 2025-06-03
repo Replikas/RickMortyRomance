@@ -109,7 +109,7 @@ export default function DialogueBox({
     <div className="relative">
       <ScrollArea 
         ref={scrollAreaRef}
-        className="h-48 sm:h-56 lg:h-64 xl:h-72 pr-4"
+        className="h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[28rem] pr-4"
       >
         <div className="space-y-4">
           {dialogues.length === 0 ? (

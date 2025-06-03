@@ -516,7 +516,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col min-h-0 pb-2">
+              <CardContent className="flex-1 flex flex-col pb-2" style={{minHeight: '400px'}}>
                 <DialogueBox 
                   dialogues={dialogues || []}
                   character={selectedCharacter}
