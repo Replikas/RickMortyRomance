@@ -77,7 +77,7 @@ export default function DialogueBox({
 
   if (isLoading) {
     return (
-      <div className="h-64 lg:h-80 flex items-center justify-center">
+      <div className="h-80 lg:h-96 xl:h-[500px] flex items-center justify-center">
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -109,7 +109,7 @@ export default function DialogueBox({
     <div className="relative">
       <ScrollArea 
         ref={scrollAreaRef}
-        className="h-64 lg:h-80 pr-4"
+        className="h-80 lg:h-96 xl:h-[500px] pr-4"
       >
         <div className="space-y-4">
           {dialogues.length === 0 ? (
@@ -172,14 +172,14 @@ export default function DialogueBox({
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.3 }}
                         className={cn(
-                          "relative rounded-xl p-4 backdrop-blur-xl border transition-all duration-500 group hover:scale-[1.02]",
+                          "relative rounded-xl p-4 backdrop-blur-xl border transition-all duration-500 group hover:scale-[1.02] min-h-[3rem]",
                           isCharacter 
                             ? "bg-card/60 border-primary/30 hover:border-primary/50 hover:bg-card/80" 
                             : "bg-blue-500/20 border-blue-400/30 hover:border-blue-400/50 hover:bg-blue-500/30"
                         )}
                       >
                         <p className={cn(
-                          "text-sm leading-relaxed",
+                          "text-sm leading-relaxed break-words whitespace-pre-wrap",
                           isCharacter ? "text-foreground" : "text-blue-300"
                         )}>
                           {isCharacter ? formatMessage(messageText) : messageText}
