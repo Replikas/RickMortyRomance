@@ -1,5 +1,9 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -20,8 +24,10 @@ app.get('/api/characters', (req, res) => {
 });
 
 // Static files
-app.use(express.static('dist'));
-app.use(express.static('dist/public'));
+const distPath = path.join(__dirname, '..', 'dist');
+const publicPath = path.join(distPath, 'public');
+app.use(express.static(publicPath));
+app.use(express.static(distPath));
 
 // Fallback
 app.get('*', (req, res) => {
