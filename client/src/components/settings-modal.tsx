@@ -38,16 +38,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState(defaultSettings);
   const [hasChanges, setHasChanges] = useState(false);
-  const [profilePicture, setProfilePicture] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Load settings from game state and user profile
+  // Load settings from game state
   useEffect(() => {
     if (gameState?.settings) {
       setSettings({ ...defaultSettings, ...gameState.settings });
-    }
-    if (currentUser?.profilePicture) {
-      setProfilePicture(currentUser.profilePicture);
     }
   }, [gameState, currentUser]);
 
@@ -153,28 +147,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   };
 
-  const updateProfilePicture = async () => {
-    if (!currentUser) return;
-    
-    try {
-      const updatedUser = await apiRequest(`/api/user/${currentUser.id}`, {
-        method: "PATCH",
-        body: { profilePicture }
-      });
-      
-      setCurrentUser(updatedUser);
-      toast({
-        title: "Profile Updated",
-        description: "Your profile picture has been saved successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update Failed",
-        description: "Failed to save profile picture. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  // Profile picture functionality removed for Render compatibility
 
   const handleReset = () => {
     setSettings(defaultSettings);
