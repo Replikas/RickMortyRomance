@@ -145,15 +145,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllCharacters(): Promise<Character[]> {
+    if (!db) {
+      // Return empty array when database is not configured
+      return [];
+    }
     return await db.select().from(characters);
   }
 
   async getCharacter(id: number): Promise<Character | undefined> {
+    if (!db) {
+      return undefined;
+    }
     const [character] = await db.select().from(characters).where(eq(characters.id, id));
     return character || undefined;
   }
 
   async createCharacter(character: InsertCharacter): Promise<Character> {
+    if (!db) {
+      // Return a mock character when database is not configured
+      return { id: Date.now(), ...character, createdAt: new Date(), updatedAt: new Date() } as Character;
+    }
     const [newCharacter] = await db
       .insert(characters)
       .values(character)

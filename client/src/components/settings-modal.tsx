@@ -274,9 +274,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat v3</SelectItem>
-                      <SelectItem value="deepseek/deepseek-r1-0528:free">DeepSeek R1 0528</SelectItem>
-                      <SelectItem value="deepseek/deepseek-r1:free">DeepSeek R1</SelectItem>
-                      <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash</SelectItem>
                       <SelectItem value="deepseek/deepseek-chat:free">DeepSeek Chat</SelectItem>
                       <SelectItem value="google/gemma-3-27b-it:free">Gemma 3 27B</SelectItem>
                       <SelectItem value="mistralai/mistral-nemo:free">Mistral Nemo</SelectItem>
