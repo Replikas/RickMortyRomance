@@ -43,7 +43,7 @@ app.use((req, res, next) => {
 (async () => {
   // Start ping service for Render uptime in production
   if (process.env.NODE_ENV === 'production') {
-    const PingService = require('../ping-service.js');
+    const { default: PingService } = await import('../ping-service.js');
     // Ping service will auto-start
   }
 
@@ -66,15 +66,33 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Use Railway's PORT environment variable or default to 5000 for local development
+  const port = parseInt(process.env.PORT || '5000', 10);
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    log(`Environment: ${process.env.NODE_ENV}`);
+    log(`Database URL configured: ${!!process.env.DATABASE_URL}`);
+    log(`Health check endpoint available at: http://0.0.0.0:${port}/api/health`);
+  });
+
+  // Handle server errors
+  server.on('error', (err) => {
+    console.error('Server error:', err);
+    process.exit(1);
+  });
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
   });
 })();

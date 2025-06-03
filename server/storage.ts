@@ -42,13 +42,21 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    this.initializeCharacters();
+    this.initializeCharacters().catch(err => {
+      console.error('Failed to initialize characters:', err);
+      // Don't crash the server if character initialization fails
+    });
   }
 
   private async initializeCharacters() {
-    // Check if characters already exist
-    const existingCharacters = await db.select().from(characters);
-    if (existingCharacters.length > 0) return;
+    try {
+      // Check if characters already exist
+      const existingCharacters = await db.select().from(characters);
+      if (existingCharacters.length > 0) return;
+    } catch (error) {
+      console.error('Database connection error during character initialization:', error);
+      return; // Skip initialization if database is not ready
+    }
 
     // Create default characters
     const rickCharacter: InsertCharacter = {
