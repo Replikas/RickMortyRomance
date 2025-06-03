@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   // Start ping service for Render uptime in production
   if (process.env.NODE_ENV === 'production') {
     try {
-      const { default: PingService } = await import('../ping-service.js');
+      const { default: PingService } = await import(path.join(process.cwd(), 'ping-service.js'));
       // Ping service will auto-start
     } catch (err) {
       console.log('Ping service not available, continuing without it');
@@ -64,13 +64,17 @@ app.use((req, res, next) => {
 
   // Serve static files in production
   const distPath = path.resolve(process.cwd(), "dist");
+  const publicPath = path.resolve(distPath, "public");
   
-  if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
+  // Check if the public subdirectory exists (Vite build output)
+  const staticPath = fs.existsSync(publicPath) ? publicPath : distPath;
+  
+  if (fs.existsSync(staticPath)) {
+    app.use(express.static(staticPath));
     
     // fall through to index.html if the file doesn't exist
     app.use("*", (_req, res) => {
-      const indexPath = path.resolve(distPath, "index.html");
+      const indexPath = path.resolve(staticPath, "index.html");
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
