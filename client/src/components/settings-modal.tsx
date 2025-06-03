@@ -94,10 +94,24 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   };
 
   const handleSave = async () => {
-    if (!gameState) return;
+    if (!gameState) {
+      toast({
+        title: "No Game State",
+        description: "Please select a character first to save settings.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
+      console.log("Saving settings for game state:", gameState.id, settings);
       const response = await apiRequest("PUT", `/api/game-state/${gameState.id}`, { settings });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
       const updatedGameState = await response.json();
       
       setGameState(updatedGameState);
@@ -108,11 +122,13 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       
       // Invalidate relevant caches
       queryClient.invalidateQueries({ queryKey: ['/api/game-states'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/game-state', currentUser?.id, gameState.characterId] });
       
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Settings save error:", error);
       toast({
         title: "Save Failed",
-        description: "Failed to save settings. Please try again.",
+        description: error.message || "Failed to save settings. Please try again.",
         variant: "destructive",
       });
     }
