@@ -257,18 +257,18 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <p className="text-xs text-muted-foreground mb-2">Choose the AI model for character responses</p>
                   <Select value={settings.aiModel} onValueChange={(value) => handleSettingChange('aiModel', value)}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select AI Model" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat v3 (Free)</SelectItem>
-                      <SelectItem value="deepseek/deepseek-r1-0528:free">DeepSeek R1 0528 (Free)</SelectItem>
-                      <SelectItem value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</SelectItem>
-                      <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Free)</SelectItem>
-                      <SelectItem value="deepseek/deepseek-chat:free">DeepSeek Chat (Free)</SelectItem>
-                      <SelectItem value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</SelectItem>
-                      <SelectItem value="mistralai/mistral-nemo:free">Mistral Nemo (Free)</SelectItem>
-                      <SelectItem value="meta-llama/llama-4-maverick:free">Llama 4 Maverick (Free)</SelectItem>
-                      <SelectItem value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat v3</SelectItem>
+                      <SelectItem value="deepseek/deepseek-r1-0528:free">DeepSeek R1 0528</SelectItem>
+                      <SelectItem value="deepseek/deepseek-r1:free">DeepSeek R1</SelectItem>
+                      <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat:free">DeepSeek Chat</SelectItem>
+                      <SelectItem value="google/gemma-3-27b-it:free">Gemma 3 27B</SelectItem>
+                      <SelectItem value="mistralai/mistral-nemo:free">Mistral Nemo</SelectItem>
+                      <SelectItem value="meta-llama/llama-4-maverick:free">Llama 4 Maverick</SelectItem>
+                      <SelectItem value="mistralai/mistral-7b-instruct:free">Mistral 7B</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
