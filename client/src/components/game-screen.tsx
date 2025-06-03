@@ -465,10 +465,10 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
             
             {/* Dialogue History - Compact */}
             <Card className="glass-morphism portal-glow flex-1 flex flex-col">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center justify-between text-glow text-sm">
+              <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                <CardTitle className="flex items-center justify-between text-glow text-xs sm:text-sm">
                   <div className="flex items-center">
-                    <MessageSquare className="w-4 h-4 mr-2 text-secondary-foreground" />
+                    <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-secondary-foreground" />
                     Chat
                   </div>
                   {/* NSFW Toggle */}
