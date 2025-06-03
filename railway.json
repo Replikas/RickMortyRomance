@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npm run build && node server/standalone.cjs",
+    "startCommand": "npm start",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300
   }
