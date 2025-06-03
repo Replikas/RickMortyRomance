@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "chmod +x railway-deploy.sh && ./railway-deploy.sh"
+    "startCommand": "node server/simple-railway.cjs"
   }
 }

@@ -189,13 +189,17 @@ app.get('*', (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
-const host = '0.0.0.0';
+const port = process.env.PORT;
 
-console.log(`Starting server on ${host}:${port}`);
+if (!port) {
+  console.error('PORT environment variable not set by Railway');
+  process.exit(1);
+}
 
-const server = app.listen(port, host, () => {
-  console.log(`Server running on ${host}:${port}`);
+console.log(`Railway PORT: ${port}`);
+
+const server = app.listen(port, () => {
+  console.log(`Server listening on Railway port ${port}`);
 });
 
 server.on('error', (err) => {
