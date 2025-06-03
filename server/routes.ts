@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let gameState = await storage.getGameState(userId, characterId);
       
       if (!gameState) {
-        // Create new game state
+        // Create new game state with default settings
         gameState = await storage.createGameState({
           userId,
           characterId,
@@ -133,6 +133,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           relationshipStatus: "stranger",
           conversationCount: 0,
           currentEmotion: "neutral",
+          settings: {
+            masterVolume: 75,
+            sfxVolume: 85,
+            musicVolume: 65,
+            animationSpeed: "normal",
+            particleEffects: true,
+            portalGlow: true,
+            autosaveFrequency: 5,
+            typingSpeed: "normal",
+            nsfwContent: false,
+            openrouterApiKey: "",
+            aiModel: "deepseek/deepseek-chat-v3-0324:free"
+          }
         });
       }
 
