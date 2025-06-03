@@ -41,6 +41,12 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Start ping service for Render uptime in production
+  if (process.env.NODE_ENV === 'production') {
+    const PingService = require('../ping-service.js');
+    // Ping service will auto-start
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

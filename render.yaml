@@ -3,8 +3,8 @@ services:
     name: rickortygame2
     env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: npm ci --production=false && npm run build
+    startCommand: node migrate.js && NODE_ENV=production node dist/index.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
