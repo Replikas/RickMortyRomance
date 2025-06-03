@@ -134,7 +134,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     if (currentGameState) {
       setGameState(currentGameState);
     }
-  }, [currentGameState, setGameState]);
+  }, [currentGameState]);
 
   // Initialize audio system on component mount
   useEffect(() => {

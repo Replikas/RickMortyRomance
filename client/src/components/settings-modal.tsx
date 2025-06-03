@@ -230,6 +230,47 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </Card>
           </div>
 
+          {/* AI & API Settings */}
+          <Card className="glass-morphism/30 border-border/30">
+            <CardHeader>
+              <CardTitle className="text-lg text-secondary-foreground flex items-center">
+                <Zap className="w-5 h-5 mr-2" />
+                AI Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">OpenRouter API Key</label>
+                  <p className="text-xs text-muted-foreground mb-2">Required for character conversations. Get your key from openrouter.ai</p>
+                  <input
+                    type="password"
+                    value={settings.openrouterApiKey}
+                    onChange={(e) => handleSettingChange('openrouterApiKey', e.target.value)}
+                    placeholder="sk-or-v1-..."
+                    className="w-full px-3 py-2 bg-background/50 border border-border rounded-md text-sm"
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium">AI Model</label>
+                  <p className="text-xs text-muted-foreground mb-2">Choose the AI model for character responses</p>
+                  <Select value={settings.aiModel} onValueChange={(value) => handleSettingChange('aiModel', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</SelectItem>
+                      <SelectItem value="anthropic/claude-3-sonnet">Claude 3 Sonnet (Balanced)</SelectItem>
+                      <SelectItem value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat">DeepSeek Chat (Fast)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Visual & Performance Settings */}
           <Card className="glass-morphism/30 border-border/30">
             <CardHeader>
