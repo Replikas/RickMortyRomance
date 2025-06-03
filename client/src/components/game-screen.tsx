@@ -64,24 +64,17 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
   // Send AI conversation request
   const conversationMutation = useMutation({
     mutationFn: async (message: string) => {
-      // Use global settings for API key and AI model (persists across all characters)
-      const apiKey = globalSettings?.openrouterApiKey;
-      
-      console.log("Checking global API key for conversation:", { 
-        globalApiKey: apiKey,
-        hasGlobalSettings: !!globalSettings
+      // Global settings are checked on the backend now
+      console.log("Sending conversation request with global settings:", { 
+        hasGlobalSettings: !!globalSettings,
+        userId: currentUser?.id || 1
       });
-      
-      if (!apiKey || apiKey.trim() === '') {
-        throw new Error('OpenRouter API key is required. Please configure your API key in settings.');
-      }
 
       return await apiRequest("POST", "/api/conversation", {
         characterId: selectedCharacter?.id,
         message,
         gameStateId: currentGameState?.id,
-        apiKey: apiKey,
-        aiModel: globalSettings?.aiModel || "deepseek/deepseek-chat-v3-0324:free",
+        userId: currentUser?.id || 1,
       }).then(res => res.json());
     },
     onSuccess: (data) => {
@@ -383,7 +376,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
             </div>
 
             {/* API Key Warning */}
-            {(!currentGameState?.settings?.openrouterApiKey || currentGameState.settings.openrouterApiKey.trim() === '') && (
+            {(!globalSettings?.openrouterApiKey || globalSettings.openrouterApiKey.trim() === '') && (
               <motion.div
                 className="glass-morphism border border-yellow-400/30 rounded-xl p-4 backdrop-blur-sm mb-4"
                 initial={{ opacity: 0, y: -20 }}

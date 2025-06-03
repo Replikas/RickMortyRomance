@@ -271,7 +271,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI conversation endpoint with OpenRouter API integration
   app.post("/api/conversation", async (req, res) => {
     try {
-      const { characterId, message, gameStateId, apiKey, aiModel } = req.body;
+      const { characterId, message, gameStateId, userId = 1 } = req.body;
+      
+      // Get user's global settings for API key and model
+      const user = await storage.getUser(userId);
+      if (!user || !user.globalSettings) {
+        return res.status(400).json({ 
+          message: "User settings not found. Please configure your API key in settings." 
+        });
+      }
+
+      const { openrouterApiKey: apiKey, aiModel } = user.globalSettings;
       
       if (!apiKey) {
         return res.status(400).json({ 
@@ -284,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Character not found" });
       }
 
-      const gameState = await storage.getGameState(0, characterId); // This would need proper user context
+      const gameState = await storage.getGameState(userId, characterId);
       
       // Get recent conversation history
       const recentDialogues = gameStateId ? 
