@@ -97,10 +97,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     if (!gameState) return;
     
     try {
-      const updatedGameState = await apiRequest(`/api/game-state/${gameState.id}`, {
-        method: "PATCH",
-        body: { settings }
-      });
+      const response = await apiRequest("PUT", `/api/game-state/${gameState.id}`, { settings });
+      const updatedGameState = await response.json();
       
       setGameState(updatedGameState);
       toast({
