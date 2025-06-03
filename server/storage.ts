@@ -104,7 +104,6 @@ export class MemStorage implements IStorage {
       color: "#FF0000",
       traits: ["psychopathic", "destructive", "chaotic", "brilliant", "remorseless", "unpredictable"],
       emotionStates: ["maniacal", "cold", "amused", "violent", "bored", "excited", "contemptuous"],
-      createdAt: new Date(),
     };
 
     this.characters.set(rickCharacter.id, rickCharacter);
@@ -161,7 +160,6 @@ export class MemStorage implements IStorage {
     const newCharacter: Character = {
       id: this.nextId++,
       ...character,
-      createdAt: new Date(),
     };
     this.characters.set(newCharacter.id, newCharacter);
     return newCharacter;
@@ -177,6 +175,7 @@ export class MemStorage implements IStorage {
   }
 
   async createGameState(gameState: InsertGameState): Promise<GameState> {
+    const now = new Date();
     const newGameState: GameState = {
       id: this.nextId++,
       userId: gameState.userId,
@@ -187,9 +186,21 @@ export class MemStorage implements IStorage {
       currentEmotion: gameState.currentEmotion ?? "neutral",
       unlockedBackstories: gameState.unlockedBackstories ?? [],
       lastSavedAt: gameState.lastSavedAt ?? null,
-      settings: gameState.settings ?? null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      settings: gameState.settings ?? {
+        masterVolume: 70,
+        sfxVolume: 70,
+        musicVolume: 50,
+        animationSpeed: "normal",
+        particleEffects: true,
+        portalGlow: true,
+        autosaveFrequency: 5,
+        typingSpeed: "normal",
+        nsfwContent: false,
+        openrouterApiKey: "",
+        aiModel: "meta-llama/llama-3.1-8b-instruct"
+      },
+      createdAt: now,
+      updatedAt: now,
     };
     this.gameStates.set(newGameState.id, newGameState);
     return newGameState;
@@ -268,17 +279,18 @@ export class MemStorage implements IStorage {
   }
 
   async createSaveSlot(saveSlot: InsertSaveSlot): Promise<SaveSlot> {
+    const now = new Date();
     const newSaveSlot: SaveSlot = {
       id: this.nextId++,
       userId: saveSlot.userId,
       slotNumber: saveSlot.slotNumber,
       gameStateSnapshot: saveSlot.gameStateSnapshot,
-      dialogueCount: saveSlot.dialogueCount,
+      dialogueCount: saveSlot.dialogueCount ?? 0,
       characterName: saveSlot.characterName,
-      affectionLevel: saveSlot.affectionLevel,
-      relationshipStatus: saveSlot.relationshipStatus,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      affectionLevel: saveSlot.affectionLevel ?? 0,
+      relationshipStatus: saveSlot.relationshipStatus ?? "stranger",
+      createdAt: now,
+      updatedAt: now,
     };
     
     const key = `${newSaveSlot.userId}-${newSaveSlot.slotNumber}`;
