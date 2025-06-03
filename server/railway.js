@@ -205,14 +205,40 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-const port = parseInt(process.env.PORT || '5000', 10);
+const port = parseInt(process.env.PORT || '8080', 10);
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`🚀 Railway server running on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'production'}`);
-  console.log(`Static directory: ${staticDir}`);
-  console.log(`Health check: http://0.0.0.0:${port}/api/health`);
-});
+// Try to start server with Railway-compatible configuration
+const startServer = () => {
+  try {
+    const server = app.listen(port, () => {
+      console.log(`🚀 Railway server running on port ${port}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'production'}`);
+      console.log(`Static directory: ${staticDir}`);
+      console.log(`Process ID: ${process.pid}`);
+      console.log(`Available environment variables:`, Object.keys(process.env).filter(k => k.includes('PORT')));
+    });
+
+    server.on('error', (err) => {
+      console.error('Server startup error:', err);
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use`);
+      }
+      setTimeout(() => process.exit(1), 1000);
+    });
+
+    server.on('listening', () => {
+      const addr = server.address();
+      console.log(`Server successfully bound to:`, addr);
+    });
+
+    return server;
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+const server = startServer();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
