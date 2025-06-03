@@ -191,7 +191,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: `user_${userId}`,
           password: "default_password",
           email: null,
-          profilePicture: null,
           globalSettings: {
             masterVolume: 75,
             sfxVolume: 50,
