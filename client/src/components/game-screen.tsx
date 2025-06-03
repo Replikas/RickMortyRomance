@@ -58,7 +58,14 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
   // Send AI conversation request
   const conversationMutation = useMutation({
     mutationFn: async (message: string) => {
-      const apiKey = currentGameState?.settings?.openrouterApiKey;
+      // Use the local gameState (which includes saved settings) instead of currentGameState
+      const apiKey = gameState?.settings?.openrouterApiKey || currentGameState?.settings?.openrouterApiKey;
+      
+      console.log("Checking API key for conversation:", { 
+        gameStateApiKey: gameState?.settings?.openrouterApiKey,
+        currentGameStateApiKey: currentGameState?.settings?.openrouterApiKey,
+        finalApiKey: apiKey
+      });
       
       if (!apiKey || apiKey.trim() === '') {
         throw new Error('OpenRouter API key is required. Please configure your API key in settings.');
@@ -69,7 +76,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
         message,
         gameStateId: currentGameState?.id,
         apiKey: apiKey,
-        aiModel: currentGameState?.settings?.aiModel || "meta-llama/llama-3.1-8b-instruct",
+        aiModel: gameState?.settings?.aiModel || currentGameState?.settings?.aiModel || "deepseek/deepseek-chat-v3-0324:free",
       }).then(res => res.json());
     },
     onSuccess: (data) => {
