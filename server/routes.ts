@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
       
       const dialogues = await storage.getDialogues(gameStateId, limit);
-      res.json(dialogues.reverse()); // Return in chronological order
+      res.json(dialogues); // Already ordered by timestamp
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch dialogues" });
     }
