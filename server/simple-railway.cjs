@@ -190,6 +190,29 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Rick and Morty Dating Simulator running on port ${port}`);
+const host = '0.0.0.0';
+
+console.log(`Starting server on ${host}:${port}`);
+
+const server = app.listen(port, host, () => {
+  console.log(`Server running on ${host}:${port}`);
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });
