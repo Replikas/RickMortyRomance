@@ -248,23 +248,23 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
 
   return (
     <motion.section 
-      className="py-4 px-2 sm:py-8 sm:px-4 min-h-screen"
+      className="py-2 px-2 sm:py-4 sm:px-4 min-h-screen overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-4xl mx-auto h-full">
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 h-full min-h-[calc(100vh-2rem)]">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2 sm:gap-3 h-full min-h-[calc(100vh-1rem)] max-h-screen">
           
           {/* Character Panel - Mobile: Top, Desktop: Left */}
           <motion.div 
-            className="lg:col-span-1 order-1 lg:order-1 space-y-3 sm:space-y-4"
+            className="lg:col-span-1 order-1 lg:order-1 space-y-2 sm:space-y-3"
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Navigation Buttons */}
-            <div className="flex flex-col space-y-2 mb-4">
+            <div className="flex flex-col space-y-2 mb-2">
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -272,9 +272,9 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                   setGameState(null);
                   onBackToSelection();
                 }}
-                className="text-muted-foreground hover:text-primary transition-colors min-h-[44px] w-full"
+                className="text-muted-foreground hover:text-primary transition-colors min-h-[36px] sm:min-h-[44px] w-full text-sm sm:text-base"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Change Character
               </Button>
               
@@ -288,7 +288,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                         playUISound('click');
                         setShowSaveLoad(true);
                       }}
-                      className="flex items-center justify-center space-x-1 border-slate-600 text-slate-300 hover:bg-slate-700 w-full"
+                      className="flex items-center justify-center space-x-1 border-slate-600 text-slate-300 hover:bg-slate-700 w-full h-8 sm:h-9"
                     >
                       <Save className="w-3 h-3" />
                       <span className="text-xs">Save/Load</span>
@@ -405,24 +405,24 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
 
             {/* Character Display */}
             <Card className="glass-morphism portal-glow">
-              <CardContent className="p-6">
+              <CardContent className="p-3 sm:p-6">
                 <div className="text-center">
                   {/* Character Sprite with Emotion */}
-                  <div className="mb-4">
+                  <div className="mb-2 sm:mb-4">
                     <CharacterSprite 
                       character={selectedCharacter}
                       emotion={currentGameState?.currentEmotion || "neutral"}
-                      size="extra-large"
+                      size="medium"
                       className="mx-auto animate-float"
                       lastMessage={dialogues && dialogues.length > 0 ? dialogues[dialogues.length - 1]?.message || "" : ""}
                       emotionalIntensity={5}
                     />
                   </div>
                   
-                  <h3 className="text-lg font-bold text-glow mb-2">
+                  <h3 className="text-base sm:text-lg font-bold text-glow mb-1 sm:mb-2">
                     {selectedCharacter.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
                     Current Emotion: 
                     <span className="text-secondary-foreground ml-1 capitalize">
                       {currentGameState?.currentEmotion || "neutral"}
@@ -457,7 +457,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
 
           {/* Dialogue and Interaction Area - Mobile: Bottom, Desktop: Right */}
           <motion.div 
-            className="lg:col-span-2 order-2 lg:order-2 space-y-3 sm:space-y-4 flex-1 flex flex-col"
+            className="lg:col-span-2 order-2 lg:order-2 space-y-2 sm:space-y-3 flex-1 flex flex-col"
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
