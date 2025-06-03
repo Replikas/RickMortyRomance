@@ -257,6 +257,47 @@ server.on('error', (err) => {
   console.error('Server error:', err);
 });
 
+// Keep-alive system for Render stability
+if (process.env.NODE_ENV === 'production') {
+  let keepAliveUrl = process.env.RENDER_EXTERNAL_URL;
+  
+  // Auto-detect render URL if not set
+  if (!keepAliveUrl && process.env.RENDER_SERVICE_NAME) {
+    keepAliveUrl = `https://${process.env.RENDER_SERVICE_NAME}.onrender.com`;
+  }
+  
+  if (keepAliveUrl) {
+    console.log('Setting up keep-alive for:', keepAliveUrl);
+    
+    // Initial ping after 30 seconds
+    setTimeout(() => {
+      setInterval(async () => {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(`${keepAliveUrl}/api/health`, {
+            signal: controller.signal,
+            headers: { 'User-Agent': 'KeepAlive/1.0' }
+          });
+          
+          clearTimeout(timeoutId);
+          console.log(`Keep-alive: ${response.status} at ${new Date().toISOString()}`);
+        } catch (error) {
+          console.log('Keep-alive failed:', error.name);
+        }
+      }, 12 * 60 * 1000); // Every 12 minutes
+    }, 30000);
+  }
+}
+
+// Memory optimization for Render
+if (global.gc) {
+  setInterval(() => {
+    global.gc();
+  }, 30000); // Force garbage collection every 30 seconds
+}
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');

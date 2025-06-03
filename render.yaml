@@ -1,18 +1,24 @@
 services:
   - type: web
-    name: rickortygame2
+    name: rick-morty-dating-sim
     env: node
-    plan: free
-    buildCommand: npm ci --production=false && npm run build
-    startCommand: node migrate.js && NODE_ENV=production node dist/index.js
-    healthCheckPath: /health
+    buildCommand: npm run build
+    startCommand: node server/deploy.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
-      - key: DATABASE_URL
-        sync: false
-    autoDeploy: true
-    branch: main
-    rootDir: .
+        value: 10000
+    healthCheckPath: /api/health
+    numInstances: 1
+    plan: free
+    region: oregon
+    buildFilter:
+      paths:
+      - client/**
+      - server/**
+      - shared/**
+      - package.json
+      - package-lock.json
+      - vite.config.ts
+      - tsconfig.json
