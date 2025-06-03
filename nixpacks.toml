@@ -2,10 +2,14 @@
 nixPkgs = ['nodejs_18', 'npm']
 
 [phases.install]
-cmds = ['npm ci']
+cmds = ['npm ci --only=production', 'npm ci']
 
 [phases.build]
-cmds = ['npm run build']
+cmds = [
+  'npm run build',
+  'ls -la',
+  'ls -la dist/ || echo "No dist directory found"'
+]
 
 [start]
 cmd = 'node server/railway-production.js'
@@ -13,3 +17,4 @@ cmd = 'node server/railway-production.js'
 [variables]
 NODE_ENV = 'production'
 PORT = '${PORT:-3000}'
+VITE_API_URL = 'https://rickmortyromance-production.up.railway.app'

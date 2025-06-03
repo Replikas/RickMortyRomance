@@ -155,49 +155,55 @@ if (fs.existsSync(publicPath)) {
   console.log('✅ Serving static files from:', publicPath);
 }
 
-// Serve built frontend
+// Serve static files from dist directory
 const distPath = path.join(process.cwd(), 'dist');
+console.log('Checking for dist directory at:', distPath);
+console.log('Dist directory exists:', fs.existsSync(distPath));
+
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  console.log('✅ Serving built frontend from:', distPath);
+  console.log('✅ Serving static files from dist directory');
+  const distFiles = fs.readdirSync(distPath);
+  console.log('Files in dist:', distFiles);
+  app.use(express.static(distPath, {
+    maxAge: '1d',
+    etag: false
+  }));
   
-  // SPA fallback
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'API endpoint not found' });
+  // Serve index.html for all non-API routes
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      return next();
     }
-    res.sendFile(path.join(distPath, 'index.html'));
+    const indexPath = path.join(distPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send('Frontend not built yet');
+    }
   });
 } else {
-  console.log('⚠️  Built frontend not found at:', distPath);
+  console.log('⚠️ Dist directory not found, serving basic response');
   
-  // Fallback HTML for when build is not available
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'API endpoint not found' });
-    }
-    
+  // Fallback route for root
+  app.get('/', (req, res) => {
     res.send(`
       <!DOCTYPE html>
-      <html lang="en">
+      <html>
         <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Rick and Morty Dating Simulator</title>
           <style>
             body {
-              font-family: Arial, sans-serif;
-              background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+              font-family: 'Courier New', monospace;
+              background: linear-gradient(45deg, #1a1a2e, #16213e);
               color: #00ff88;
-              margin: 0;
-              padding: 20px;
-              min-height: 100vh;
               display: flex;
-              align-items: center;
               justify-content: center;
-              text-align: center;
+              align-items: center;
+              min-height: 100vh;
+              margin: 0;
             }
             .container {
+              text-align: center;
               max-width: 600px;
               padding: 40px;
               border: 2px solid #00ff88;
@@ -217,10 +223,19 @@ if (fs.existsSync(distPath)) {
             <p>The backend API is operational. Frontend build will be available after deployment completes.</p>
             <p>API Health Check: <a href="/api/health" class="api-link">/api/health</a></p>
             <p>Characters API: <a href="/api/characters" class="api-link">/api/characters</a></p>
+            <p>Build Status: <span style="color: #ff6b6b;">Frontend not built</span></p>
           </div>
         </body>
       </html>
     `);
+  });
+  
+  // Catch-all for other routes when no dist
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    res.redirect('/');
   });
 }
 
