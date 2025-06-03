@@ -184,18 +184,22 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     // Play UI sound for selection
     playUISound('select');
 
-    // Add player message to dialogue
-    addDialogueMutation.mutate({
-      gameStateId: currentGameState.id,
-      speaker: "player",
-      message: choice.text,
-      messageType: "choice",
-      affectionChange: 0,
-    });
+    // Add player message to dialogue first, then wait for it to complete
+    try {
+      await addDialogueMutation.mutateAsync({
+        gameStateId: currentGameState.id,
+        speaker: "player",
+        message: choice.text,
+        messageType: "choice",
+        affectionChange: 0,
+      });
 
-    // Trigger AI response
-    setIsTyping(true);
-    conversationMutation.mutate(choice.text);
+      // Only trigger AI response after player message is saved
+      setIsTyping(true);
+      conversationMutation.mutate(choice.text);
+    } catch (error) {
+      console.error("Failed to add player message:", error);
+    }
   };
 
   const handleCustomMessage = async () => {
@@ -204,18 +208,22 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     const message = customMessage.trim();
     setCustomMessage("");
 
-    // Add player message to dialogue
-    addDialogueMutation.mutate({
-      gameStateId: currentGameState.id,
-      speaker: "player",
-      message,
-      messageType: "custom",
-      affectionChange: 0,
-    });
+    // Add player message to dialogue first, then wait for it to complete
+    try {
+      await addDialogueMutation.mutateAsync({
+        gameStateId: currentGameState.id,
+        speaker: "player",
+        message,
+        messageType: "custom",
+        affectionChange: 0,
+      });
 
-    // Trigger AI response
-    setIsTyping(true);
-    conversationMutation.mutate(message);
+      // Only trigger AI response after player message is saved
+      setIsTyping(true);
+      conversationMutation.mutate(message);
+    } catch (error) {
+      console.error("Failed to add player message:", error);
+    }
   };
 
   if (!selectedCharacter) {
