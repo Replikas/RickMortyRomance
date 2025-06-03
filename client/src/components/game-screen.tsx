@@ -44,13 +44,13 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
   const [isHoveringOriginRoute, setIsHoveringOriginRoute] = useState(false);
 
   // Get or create game state
-  const { data: currentGameState, isLoading: gameStateLoading } = useQuery({
+  const { data: currentGameState, isLoading: gameStateLoading } = useQuery<any>({
     queryKey: [`/api/game-state/${currentUser?.id || 1}/${selectedCharacter?.id}`],
     enabled: !!selectedCharacter,
   });
 
   // Get dialogue history
-  const { data: dialogues, isLoading: dialoguesLoading } = useQuery({
+  const { data: dialogues = [], isLoading: dialoguesLoading } = useQuery<any[]>({
     queryKey: [`/api/dialogues/${currentGameState?.id}`],
     enabled: !!currentGameState?.id,
   });
@@ -129,12 +129,12 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     },
   });
 
-  // Initialize local game state when first loaded
+  // Initialize local game state when first loaded (prevent infinite loop)
   useEffect(() => {
-    if (currentGameState && !gameState) {
+    if (currentGameState && (!gameState || gameState.id !== currentGameState.id)) {
       setGameState(currentGameState);
     }
-  }, [currentGameState, gameState, setGameState]);
+  }, [currentGameState?.id]);
 
   // Initialize audio system on component mount
   useEffect(() => {

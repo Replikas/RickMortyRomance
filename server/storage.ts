@@ -71,7 +71,6 @@ export class MemStorage implements IStorage {
       color: "#00D4AA",
       traits: ["genius", "cynical", "alcoholic", "protective", "emotionally_distant"],
       emotionStates: ["neutral", "annoyed", "drunk", "excited", "angry", "vulnerable", "smug"],
-      createdAt: new Date(),
     };
 
     const mortyCharacter: Character = {
@@ -83,7 +82,6 @@ export class MemStorage implements IStorage {
       color: "#FFB800",
       traits: ["anxious", "moral", "growing", "loyal", "insecure", "brave_when_needed"],
       emotionStates: ["nervous", "excited", "scared", "determined", "happy", "confused", "angry"],
-      createdAt: new Date(),
     };
 
     const evilMortyCharacter: Character = {
@@ -95,7 +93,6 @@ export class MemStorage implements IStorage {
       color: "#8B0000",
       traits: ["manipulative", "intelligent", "cold", "calculating", "independent", "ruthless"],
       emotionStates: ["cold", "calculating", "angry", "satisfied", "contemplative", "sinister", "disappointed"],
-      createdAt: new Date(),
     };
 
     const rickPrimeCharacter: Character = {
