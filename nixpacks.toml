@@ -1,20 +1,16 @@
 [phases.setup]
-nixPkgs = ['nodejs_18', 'npm']
+nixPkgs = ["nodejs-18_x", "npm"]
 
 [phases.install]
-cmds = ['npm ci --only=production', 'npm ci']
+cmds = ["echo 'Skipping install phase - will be handled by deployment script'"]
 
 [phases.build]
-cmds = [
-  'npm run build',
-  'ls -la',
-  'ls -la dist/ || echo "No dist directory found"'
-]
+cmds = ["echo 'Skipping build phase - will be handled by deployment script'"]
 
 [start]
-cmd = 'node server/railway-production.js'
+cmd = "node railway-deploy.js"
 
 [variables]
-NODE_ENV = 'production'
-PORT = '${PORT:-3000}'
-VITE_API_URL = 'https://rickmortyromance-production.up.railway.app'
+NODE_ENV = "production"
+PORT = "${PORT:-3000}"
+VITE_API_URL = "https://rickmortyromance-production.up.railway.app"
