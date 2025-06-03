@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npm run dev",
+    "startCommand": "tsx server/railway-server.ts",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300
   }
