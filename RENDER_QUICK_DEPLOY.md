@@ -34,11 +34,12 @@ Add to your package.json scripts section:
 - **Save/Load System** - Multiple save slots per user
 - **Portal UI Theme** - Teal/green glassmorphism design
 
-## Environment Variables (Auto-Configured)
-- `DATABASE_URL` - PostgreSQL connection (from database service)
-- `NODE_ENV=production` - Production mode
-- `PORT=5000` - Web service port
-- `RENDER_EXTERNAL_URL` - For ping service (auto-detected)
+## Environment Variables Setup
+When deploying to Render, you'll need to manually add the DATABASE_URL:
+- `DATABASE_URL` - Your existing Neon database connection string
+- `NODE_ENV=production` - Auto-configured by Render
+- `PORT=5000` - Auto-configured by Render
+- `RENDER_EXTERNAL_URL` - Auto-detected by ping service
 
 ## Post-Deployment
 Users configure OpenRouter API keys in settings panel. Keys persist globally across all character interactions.
