@@ -260,10 +260,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</SelectItem>
-                      <SelectItem value="anthropic/claude-3-sonnet">Claude 3 Sonnet (Balanced)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat v3 (Free)</SelectItem>
                       <SelectItem value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</SelectItem>
-                      <SelectItem value="deepseek/deepseek-chat">DeepSeek Chat (Fast)</SelectItem>
+                      <SelectItem value="anthropic/claude-3-haiku:beta">Claude 3 Haiku (Fast)</SelectItem>
+                      <SelectItem value="anthropic/claude-3.5-sonnet:beta">Claude 3.5 Sonnet (Best)</SelectItem>
+                      <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini (Fast)</SelectItem>
+                      <SelectItem value="openai/gpt-4o">GPT-4o (Best)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

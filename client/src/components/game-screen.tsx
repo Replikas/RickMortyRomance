@@ -129,12 +129,12 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     },
   });
 
-  // Update local game state when data loads
+  // Initialize local game state when first loaded
   useEffect(() => {
-    if (currentGameState) {
+    if (currentGameState && !gameState) {
       setGameState(currentGameState);
     }
-  }, [currentGameState]);
+  }, [currentGameState, gameState, setGameState]);
 
   // Initialize audio system on component mount
   useEffect(() => {
