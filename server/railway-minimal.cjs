@@ -58,14 +58,19 @@ app.get('*', (req, res) => {
   res.send('Rick and Morty Dating Simulator - Server Running');
 });
 
-// Railway requires listening on process.env.PORT
-const PORT = process.env.PORT || 3000;
+// Railway port configuration - must match exactly
+const PORT = process.env.PORT;
 
-console.log('Starting Railway server on port:', PORT);
+if (!PORT) {
+  console.error('PORT environment variable not set');
+  process.exit(1);
+}
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+console.log('Railway PORT:', PORT);
+
+app.listen(PORT, () => {
+  console.log(`Railway server running on port ${PORT}`);
 }).on('error', (err) => {
-  console.error('Server error:', err);
+  console.error('Server startup error:', err);
   process.exit(1);
 });
