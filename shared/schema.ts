@@ -9,6 +9,31 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   email: text("email"),
   profilePicture: text("profile_picture"), // URL or base64 encoded image
+  globalSettings: jsonb("global_settings").$type<{
+    masterVolume: number;
+    sfxVolume: number;
+    musicVolume: number;
+    animationSpeed: string;
+    particleEffects: boolean;
+    portalGlow: boolean;
+    autosaveFrequency: number;
+    typingSpeed: string;
+    nsfwContent: boolean;
+    openrouterApiKey: string;
+    aiModel: string;
+  }>().default({
+    masterVolume: 75,
+    sfxVolume: 50,
+    musicVolume: 25,
+    animationSpeed: "normal",
+    particleEffects: true,
+    portalGlow: true,
+    autosaveFrequency: 5,
+    typingSpeed: "normal",
+    nsfwContent: false,
+    openrouterApiKey: "",
+    aiModel: "deepseek/deepseek-chat-v3-0324:free",
+  }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

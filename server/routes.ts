@@ -179,6 +179,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user global settings (API keys, preferences)
+  app.get("/api/user/:userId/settings", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(user.globalSettings || {
+        masterVolume: 75,
+        sfxVolume: 50,
+        musicVolume: 25,
+        animationSpeed: "normal",
+        particleEffects: true,
+        portalGlow: true,
+        autosaveFrequency: 5,
+        typingSpeed: "normal",
+        nsfwContent: false,
+        openrouterApiKey: "",
+        aiModel: "deepseek/deepseek-chat-v3-0324:free",
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user settings" });
+    }
+  });
+
+  // Update user global settings
+  app.put("/api/user/:userId/settings", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const settings = req.body;
+      
+      const user = await storage.updateUserGlobalSettings(userId, settings);
+      res.json(user.globalSettings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user settings" });
+    }
+  });
+
   // Dialogue routes
   app.get("/api/dialogues/:gameStateId", async (req, res) => {
     try {

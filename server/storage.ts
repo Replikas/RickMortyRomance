@@ -12,6 +12,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  updateUserGlobalSettings(id: number, settings: any): Promise<User>;
 
   // Character operations
   getAllCharacters(): Promise<Character[]>;
@@ -115,6 +116,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserGlobalSettings(id: number, settings: any): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ globalSettings: settings })
       .where(eq(users.id, id))
       .returning();
     return user;
