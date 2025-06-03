@@ -1,231 +1,140 @@
 const https = require('https');
 const http = require('http');
 
-// Configuration
-const CONFIG = {
-  // Your Render app URL (update this after deployment)
-  TARGET_URL: process.env.RENDER_URL || 'https://your-app-name.onrender.com',
-  
-  // Ping intervals
-  PING_INTERVAL: 14 * 60 * 1000, // 14 minutes (Render free tier sleeps after 15 min)
-  HEALTH_CHECK_INTERVAL: 5 * 60 * 1000, // 5 minutes for health checks
-  
-  // Retry settings
-  MAX_RETRIES: 3,
-  RETRY_DELAY: 30 * 1000, // 30 seconds
-  
-  // Request timeout
-  TIMEOUT: 30 * 1000, // 30 seconds
-};
-
 class RenderPingService {
   constructor() {
+    this.appUrl = process.env.RENDER_EXTERNAL_URL || 'https://rickortygame2.onrender.com';
+    this.pingInterval = 14 * 60 * 1000; // 14 minutes
     this.isRunning = false;
+    this.startTime = Date.now();
     this.pingCount = 0;
-    this.lastPingTime = null;
-    this.consecutiveFailures = 0;
-    this.startTime = new Date();
+    this.failCount = 0;
   }
 
-  // Make HTTP request with timeout and retries
   makeRequest(url, options = {}) {
+    const protocol = url.startsWith('https:') ? https : http;
+    
     return new Promise((resolve, reject) => {
-      const protocol = url.startsWith('https') ? https : http;
-      const timeout = options.timeout || CONFIG.TIMEOUT;
-      
-      const req = protocol.get(url, (res) => {
+      const req = protocol.get(url, options, (res) => {
         let data = '';
-        
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        
-        res.on('end', () => {
-          resolve({
-            statusCode: res.statusCode,
-            data: data,
-            headers: res.headers
-          });
-        });
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => resolve({
+          statusCode: res.statusCode,
+          headers: res.headers,
+          data: data
+        }));
       });
       
-      req.on('error', (error) => {
-        reject(error);
-      });
-      
-      req.setTimeout(timeout, () => {
+      req.on('error', reject);
+      req.setTimeout(30000, () => {
         req.destroy();
-        reject(new Error(`Request timeout after ${timeout}ms`));
+        reject(new Error('Request timeout'));
       });
     });
   }
 
-  // Ping the main application
   async pingApp() {
     try {
-      console.log(`🏓 Pinging ${CONFIG.TARGET_URL}...`);
+      console.log(`[${new Date().toISOString()}] Pinging ${this.appUrl}/health`);
       
-      const response = await this.makeRequest(CONFIG.TARGET_URL);
+      const response = await this.makeRequest(`${this.appUrl}/health`);
       
       if (response.statusCode === 200) {
         this.pingCount++;
-        this.lastPingTime = new Date();
-        this.consecutiveFailures = 0;
-        
-        console.log(`✅ Ping #${this.pingCount} successful - Status: ${response.statusCode}`);
-        console.log(`📊 Uptime: ${this.getUptime()}`);
-        
-        return true;
+        console.log(`✅ Ping successful (${this.pingCount}) - Status: ${response.statusCode}`);
+        this.failCount = 0;
       } else {
-        throw new Error(`HTTP ${response.statusCode}`);
+        this.failCount++;
+        console.log(`⚠️ Ping returned ${response.statusCode} - Fail count: ${this.failCount}`);
       }
+      
     } catch (error) {
-      this.consecutiveFailures++;
-      console.error(`❌ Ping failed (${this.consecutiveFailures}/${CONFIG.MAX_RETRIES}): ${error.message}`);
+      this.failCount++;
+      console.error(`❌ Ping failed (${this.failCount}):`, error.message);
       
-      if (this.consecutiveFailures >= CONFIG.MAX_RETRIES) {
-        console.error(`🚨 Max retries reached. Service may be down.`);
-        // You could add notification logic here (email, webhook, etc.)
+      if (this.failCount >= 3) {
+        console.log('🔄 Multiple failures detected - attempting health check...');
+        await this.healthCheck();
       }
-      
-      return false;
     }
   }
 
-  // Health check endpoint
   async healthCheck() {
     try {
-      const healthUrl = `${CONFIG.TARGET_URL}/health`;
-      const response = await this.makeRequest(healthUrl);
-      
+      const response = await this.makeRequest(`${this.appUrl}/api/characters`);
       if (response.statusCode === 200) {
-        const healthData = JSON.parse(response.data);
-        console.log(`💚 Health check OK - App uptime: ${healthData.uptime}s`);
-        return true;
+        console.log('💚 Health check passed - API is responding');
+        this.failCount = 0;
+      } else {
+        console.log(`🔴 Health check failed - API returned ${response.statusCode}`);
       }
     } catch (error) {
-      console.warn(`⚠️ Health check failed: ${error.message}`);
-      return false;
+      console.error('🔴 Health check error:', error.message);
     }
   }
 
-  // Get service uptime
   getUptime() {
-    const uptimeMs = Date.now() - this.startTime.getTime();
+    const uptimeMs = Date.now() - this.startTime;
     const hours = Math.floor(uptimeMs / (1000 * 60 * 60));
     const minutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m`;
   }
 
-  // Get next ping time
   getNextPingTime() {
-    if (!this.lastPingTime) return 'Soon';
-    const nextPing = new Date(this.lastPingTime.getTime() + CONFIG.PING_INTERVAL);
+    const nextPing = new Date(Date.now() + this.pingInterval);
     return nextPing.toLocaleTimeString();
   }
 
-  // Start the ping service
   start() {
     if (this.isRunning) {
-      console.log('🔄 Ping service is already running');
+      console.log('🔄 Ping service already running');
       return;
     }
 
-    console.log('🚀 Starting Render Ping Service');
-    console.log(`📍 Target URL: ${CONFIG.TARGET_URL}`);
-    console.log(`⏱️ Ping interval: ${CONFIG.PING_INTERVAL / 60000} minutes`);
-    console.log(`🔍 Health check interval: ${CONFIG.HEALTH_CHECK_INTERVAL / 60000} minutes`);
-    
     this.isRunning = true;
-
+    console.log('🚀 Starting Render ping service for continuous uptime');
+    console.log(`📍 Target URL: ${this.appUrl}`);
+    console.log(`⏰ Ping interval: ${this.pingInterval / 1000 / 60} minutes`);
+    
     // Initial ping
     this.pingApp();
-
-    // Set up regular pings
-    this.pingInterval = setInterval(() => {
+    
+    // Set up interval
+    this.intervalId = setInterval(() => {
+      console.log(`📊 Uptime: ${this.getUptime()} | Next ping: ${this.getNextPingTime()}`);
       this.pingApp();
-    }, CONFIG.PING_INTERVAL);
-
-    // Set up health checks
-    this.healthInterval = setInterval(() => {
-      this.healthCheck();
-    }, CONFIG.HEALTH_CHECK_INTERVAL);
-
-    // Log status every hour
-    this.statusInterval = setInterval(() => {
-      console.log(`📈 Status Report:`);
-      console.log(`   • Total pings: ${this.pingCount}`);
-      console.log(`   • Service uptime: ${this.getUptime()}`);
-      console.log(`   • Next ping: ${this.getNextPingTime()}`);
-      console.log(`   • Consecutive failures: ${this.consecutiveFailures}`);
-    }, 60 * 60 * 1000); // Every hour
-
+    }, this.pingInterval);
+    
     console.log('✅ Ping service started successfully');
   }
 
-  // Stop the ping service
   stop() {
-    if (!this.isRunning) {
-      console.log('⏹️ Ping service is not running');
-      return;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.isRunning = false;
+      console.log('🛑 Ping service stopped');
     }
-
-    console.log('⏹️ Stopping ping service...');
-    
-    this.isRunning = false;
-    
-    if (this.pingInterval) clearInterval(this.pingInterval);
-    if (this.healthInterval) clearInterval(this.healthInterval);
-    if (this.statusInterval) clearInterval(this.statusInterval);
-    
-    console.log('✅ Ping service stopped');
   }
 
-  // Get current status
   getStatus() {
     return {
       isRunning: this.isRunning,
-      pingCount: this.pingCount,
       uptime: this.getUptime(),
-      lastPing: this.lastPingTime,
-      nextPing: this.getNextPingTime(),
-      consecutiveFailures: this.consecutiveFailures,
-      targetUrl: CONFIG.TARGET_URL
+      pingCount: this.pingCount,
+      failCount: this.failCount,
+      nextPing: this.getNextPingTime()
     };
   }
 }
 
-// Create and export service instance
-const pingService = new RenderPingService();
-
-// Handle process signals
-process.on('SIGINT', () => {
-  console.log('\n🛑 Received SIGINT, shutting down gracefully...');
-  pingService.stop();
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
-  pingService.stop();
-  process.exit(0);
-});
-
-// Auto-start if run directly
-if (require.main === module) {
-  // Check if URL is provided
-  if (process.argv[2]) {
-    CONFIG.TARGET_URL = process.argv[2];
-  }
-  
-  if (!CONFIG.TARGET_URL || CONFIG.TARGET_URL.includes('your-app-name')) {
-    console.error('❌ Please provide your Render app URL:');
-    console.error('   node ping-service.js https://your-app-name.onrender.com');
-    console.error('   OR set RENDER_URL environment variable');
-    process.exit(1);
-  }
-  
+// Auto-start in production
+if (process.env.NODE_ENV === 'production') {
+  const pingService = new RenderPingService();
   pingService.start();
+  
+  // Graceful shutdown
+  process.on('SIGTERM', () => pingService.stop());
+  process.on('SIGINT', () => pingService.stop());
 }
 
-module.exports = { RenderPingService, pingService };
+module.exports = RenderPingService;

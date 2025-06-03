@@ -1,37 +1,46 @@
-# Quick Render Deployment Steps
+# Rick & Morty Dating Simulator - One-Click Render Deploy
 
-## Step 1: Push to GitHub
-```bash
-git add .
-git commit -m "Ready for Render deployment"
-git push origin main
+## Pre-Deploy Checklist
+✅ `render.yaml` - Database and web service configuration  
+✅ `database_setup.sql` - Complete PostgreSQL schema with character data  
+✅ `migrate.js` - Auto-migration script for database setup  
+✅ `ping-service.js` - Continuous uptime service (prevents sleep)  
+
+## Required Package.json Updates
+Add to your package.json scripts section:
+```json
+{
+  "scripts": {
+    "migrate": "node migrate.js",
+    "start": "node migrate.js && NODE_ENV=production node dist/index.js"
+  }
+}
 ```
 
-## Step 2: Deploy on Render
-1. Go to https://render.com
-2. Click "New" → "Web Service"
-3. Connect GitHub → Select `rickortygame2` repository
-4. Use these settings:
+## Deployment Steps
+1. **Push to GitHub** with all files
+2. **Connect to Render** - Link your GitHub repository
+3. **Auto-Deploy** - Render will read `render.yaml` and:
+   - Create PostgreSQL database (`rickortygame2-db`)
+   - Build and deploy web service (`rickortygame2`)
+   - Run migrations automatically on startup
+   - Start ping service for continuous uptime
 
-**Basic Settings:**
-- Name: `rickortygame2`
-- Environment: `Node`
-- Build Command: `npm install && npm run build`
-- Start Command: `npm run dev`
+## Key Features Ready for Production
+- **Global API Key Storage** - OpenRouter keys persist across all characters
+- **PostgreSQL Database** - Full persistence with 4 pre-loaded characters
+- **Continuous Uptime** - Ping service prevents Render free tier sleep
+- **Character AI Conversations** - Rick C-137, Morty, Evil Morty, Rick Prime
+- **Save/Load System** - Multiple save slots per user
+- **Portal UI Theme** - Teal/green glassmorphism design
 
-**Advanced Settings:**
-- Auto-Deploy: `Yes`
-- Branch: `main`
+## Environment Variables (Auto-Configured)
+- `DATABASE_URL` - PostgreSQL connection (from database service)
+- `NODE_ENV=production` - Production mode
+- `PORT=5000` - Web service port
+- `RENDER_EXTERNAL_URL` - For ping service (auto-detected)
 
-## Step 3: After Deployment
-1. Your app will be live at: `https://rickortygame2.onrender.com`
-2. Update GitHub Actions file with your actual URL
-3. GitHub will automatically keep your app alive
+## Post-Deployment
+Users configure OpenRouter API keys in settings panel. Keys persist globally across all character interactions.
 
-## Files Already Configured:
-- ✅ render.yaml (Render configuration)
-- ✅ Health check endpoints (/health, /status)
-- ✅ GitHub Actions for uptime monitoring
-- ✅ Ping service for continuous operation
-
-Your Rick and Morty Dating Simulator is ready to deploy!
+Your Rick & Morty Dating Simulator will be live at: `https://rickortygame2.onrender.com`
