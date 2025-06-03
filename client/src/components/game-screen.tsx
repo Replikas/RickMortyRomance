@@ -55,16 +55,21 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     enabled: !!currentGameState?.id,
   });
 
+  // Get user global settings (API keys, preferences)
+  const { data: globalSettings, isLoading: settingsLoading } = useQuery<any>({
+    queryKey: [`/api/user/${currentUser?.id || 1}/settings`],
+    enabled: !!currentUser?.id,
+  });
+
   // Send AI conversation request
   const conversationMutation = useMutation({
     mutationFn: async (message: string) => {
-      // Use the local gameState (which includes saved settings) instead of currentGameState
-      const apiKey = gameState?.settings?.openrouterApiKey || currentGameState?.settings?.openrouterApiKey;
+      // Use global settings for API key and AI model (persists across all characters)
+      const apiKey = globalSettings?.openrouterApiKey;
       
-      console.log("Checking API key for conversation:", { 
-        gameStateApiKey: gameState?.settings?.openrouterApiKey,
-        currentGameStateApiKey: currentGameState?.settings?.openrouterApiKey,
-        finalApiKey: apiKey
+      console.log("Checking global API key for conversation:", { 
+        globalApiKey: apiKey,
+        hasGlobalSettings: !!globalSettings
       });
       
       if (!apiKey || apiKey.trim() === '') {
@@ -76,7 +81,7 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
         message,
         gameStateId: currentGameState?.id,
         apiKey: apiKey,
-        aiModel: gameState?.settings?.aiModel || currentGameState?.settings?.aiModel || "deepseek/deepseek-chat-v3-0324:free",
+        aiModel: globalSettings?.aiModel || "deepseek/deepseek-chat-v3-0324:free",
       }).then(res => res.json());
     },
     onSuccess: (data) => {

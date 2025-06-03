@@ -7,8 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useGameContext } from "@/context/game-context";
-import { useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   Volume2, 
   VolumeX, 
@@ -60,23 +60,29 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [settings, setSettings] = useState(defaultSettings);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Load settings from game state
+  // Get user global settings
+  const { data: globalSettings, isLoading: settingsLoading } = useQuery<any>({
+    queryKey: [`/api/user/${currentUser?.id || 1}/settings`],
+    enabled: !!currentUser?.id,
+  });
+
+  // Load settings from global user settings (not per-character)
   useEffect(() => {
-    if (gameState?.settings) {
-      console.log("Loading settings from game state:", gameState.settings);
-      setSettings({ ...defaultSettings, ...gameState.settings });
-    } else {
-      console.log("No settings in game state, using defaults");
+    if (globalSettings) {
+      console.log("Loading settings from global user settings:", globalSettings);
+      setSettings({ ...defaultSettings, ...globalSettings });
+    } else if (!settingsLoading) {
+      console.log("No global settings found, using defaults");
       setSettings(defaultSettings);
     }
-  }, [gameState?.settings]);
+  }, [globalSettings, settingsLoading]);
 
   // Track changes
   useEffect(() => {
-    const originalSettings = gameState?.settings || defaultSettings;
+    const originalSettings = globalSettings || defaultSettings;
     const changed = JSON.stringify(settings) !== JSON.stringify(originalSettings);
     setHasChanges(changed);
-  }, [settings, gameState]);
+  }, [settings, globalSettings]);
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -97,19 +103,33 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   };
 
-  const handleSave = async () => {
-    if (!gameState) {
+  // Save settings mutation for global user settings
+  const saveSettingsMutation = useMutation({
+    mutationFn: async (settingsToSave: any) => {
+      console.log("Saving global user settings:", settingsToSave);
+      const response = await apiRequest("PUT", `/api/user/${currentUser?.id || 1}/settings`, settingsToSave);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/user/${currentUser?.id || 1}/settings`] });
       toast({
-        title: "No Game State",
-        description: "Please select a character first to save settings.",
+        title: "Settings Saved",
+        description: "Your settings have been saved and will persist across all characters.",
+      });
+      setHasChanges(false);
+    },
+    onError: () => {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save settings. Please try again.",
         variant: "destructive",
       });
-      return;
-    }
-    
+    },
+  });
+
+  const handleSave = async () => {
     try {
-      console.log("Saving settings for game state:", gameState.id, settings);
-      const response = await apiRequest("PUT", `/api/game-state/${gameState.id}`, { settings });
+      saveSettingsMutation.mutate(settings);
       
       if (!response.ok) {
         const errorData = await response.json();

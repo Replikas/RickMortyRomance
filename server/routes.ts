@@ -183,10 +183,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/:userId/settings", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
-      const user = await storage.getUser(userId);
+      let user = await storage.getUser(userId);
       
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        // Create default user if it doesn't exist
+        user = await storage.createUser({
+          username: `user_${userId}`,
+          password: "default_password",
+          email: null,
+          profilePicture: null,
+          globalSettings: {
+            masterVolume: 75,
+            sfxVolume: 50,
+            musicVolume: 25,
+            animationSpeed: "normal",
+            particleEffects: true,
+            portalGlow: true,
+            autosaveFrequency: 5,
+            typingSpeed: "normal",
+            nsfwContent: false,
+            openrouterApiKey: "",
+            aiModel: "deepseek/deepseek-chat-v3-0324:free",
+          }
+        });
       }
       
       res.json(user.globalSettings || {
