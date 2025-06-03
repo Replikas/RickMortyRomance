@@ -39,13 +39,13 @@ app.get('/api/characters', (req, res) => {
 
 // Serve built frontend files
 const fs = require('fs');
-const distPath = './dist';
+const distPath = './dist/public';
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 }
 
-// Serve public assets
-app.use(express.static('public'));
+// Serve public assets (sounds, etc.)
+app.use('/sounds', express.static('./public/sounds'));
 
 // Catch-all route for SPA
 app.get('*', (req, res) => {
@@ -54,7 +54,7 @@ app.get('*', (req, res) => {
   }
   
   // Try to serve index.html for SPA routing
-  const indexPath = './dist/index.html';
+  const indexPath = './dist/public/index.html';
   if (fs.existsSync(indexPath)) {
     res.sendFile(require('path').resolve(indexPath));
   } else {
