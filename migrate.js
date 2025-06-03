@@ -4,8 +4,8 @@ const path = require('path');
 
 async function runMigrations() {
   if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL environment variable is required');
-    process.exit(1);
+    console.log('DATABASE_URL not found - skipping migrations (development mode)');
+    return;
   }
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
