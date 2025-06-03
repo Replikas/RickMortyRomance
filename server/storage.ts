@@ -50,6 +50,12 @@ export class DatabaseStorage implements IStorage {
 
   private async initializeCharacters() {
     try {
+      // Skip if database is not configured
+      if (!db) {
+        console.log('Database not configured, skipping character initialization');
+        return;
+      }
+      
       // Check if characters already exist
       const existingCharacters = await db.select().from(characters);
       if (existingCharacters.length > 0) return;
