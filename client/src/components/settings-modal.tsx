@@ -63,9 +63,13 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   // Load settings from game state
   useEffect(() => {
     if (gameState?.settings) {
+      console.log("Loading settings from game state:", gameState.settings);
       setSettings({ ...defaultSettings, ...gameState.settings });
+    } else {
+      console.log("No settings in game state, using defaults");
+      setSettings(defaultSettings);
     }
-  }, [gameState, currentUser]);
+  }, [gameState?.settings]);
 
   // Track changes
   useEffect(() => {
@@ -115,6 +119,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       const updatedGameState = await response.json();
       
       setGameState(updatedGameState);
+      // Force reload settings from the updated game state
+      setSettings({ ...defaultSettings, ...updatedGameState.settings });
+      setHasChanges(false);
+      
       toast({
         title: "Settings Saved",
         description: "Your preferences have been saved successfully.",
