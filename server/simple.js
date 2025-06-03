@@ -35,6 +35,18 @@ app.get('*', (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const host = process.env.HOST || '0.0.0.0';
+
+console.log('Starting server with configuration:');
+console.log('Port:', port);
+console.log('Host:', host);
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Available env vars:', Object.keys(process.env).filter(k => k.includes('PORT') || k.includes('HOST')));
+
+app.listen(port, host, () => {
+  console.log(`Server running on ${host}:${port}`);
+  console.log('Server startup successful');
+}).on('error', (err) => {
+  console.error('Server startup failed:', err);
+  process.exit(1);
 });
