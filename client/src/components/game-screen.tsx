@@ -167,66 +167,9 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
     }
   }, [dialogues, selectedCharacter, currentGameState?.currentEmotion, previousDialogueLength]);
 
-  // Hint system effects
-  useEffect(() => {
-    if (!currentGameState || !selectedCharacter) return;
+  // Removed persistent hint system - all hints now show only on hover
 
-    // Show first conversation hint
-    if (!hasShownFirstConversationHint && dialogues && dialogues.length === 0) {
-      showHint({
-        ...HINT_CONFIGS.FIRST_CONVERSATION,
-        targetElement: "choice-buttons"
-      });
-      setHasShownFirstConversationHint(true);
-    }
-
-    // Show save game hint after a few exchanges
-    if (!hasShownSaveGameHint && dialogues && dialogues.length >= 4) {
-      showHint({
-        ...HINT_CONFIGS.SAVE_GAME_TIP,
-        targetElement: "save-load-button"
-      });
-      setHasShownSaveGameHint(true);
-    }
-
-    // Show memories locked hint when approaching the unlock threshold
-    const affectionLevel = currentGameState.affectionLevel || 0;
-    if (!hasShownMemoriesHint && affectionLevel >= 10 && affectionLevel < 25) {
-      showHint({
-        ...HINT_CONFIGS.MEMORIES_LOCKED,
-        progress: affectionLevel,
-        maxProgress: 25,
-        targetElement: "memories-button"
-      });
-      setHasShownMemoriesHint(true);
-    }
-
-    // Show unlock notification when memories become available
-    if (affectionLevel >= 25) {
-      hideHint("memories-locked");
-      showHint({
-        ...HINT_CONFIGS.BACKSTORY_UNLOCK,
-        targetElement: "memories-button"
-      });
-    }
-
-    // Update progress for existing progress hints
-    updateHintProgress("memories-locked", affectionLevel);
-    updateHintProgress("affection-progress", affectionLevel);
-
-  }, [currentGameState, dialogues, selectedCharacter, hasShownFirstConversationHint, hasShownSaveGameHint, hasShownMemoriesHint, showHint, hideHint, updateHintProgress]);
-
-  // Show API key warning hint if no key is configured
-  useEffect(() => {
-    if (currentGameState && (!currentGameState.settings?.openrouterApiKey || currentGameState.settings.openrouterApiKey.trim() === '')) {
-      showHint({
-        ...HINT_CONFIGS.API_KEY_WARNING,
-        targetElement: "settings-button"
-      });
-    } else {
-      hideHint("api-key-warning");
-    }
-  }, [currentGameState?.settings?.openrouterApiKey, showHint, hideHint]);
+  // API key warning removed - converted to hover-only behavior
 
   const handleChoiceSelect = async (choice: any) => {
     if (!currentGameState) return;
@@ -584,16 +527,6 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
                     onChoiceSelect={handleChoiceSelect}
                     disabled={isTyping || conversationMutation.isPending}
                     conversationHistory={dialogues || []}
-                  />
-                  <HintBubble
-                    isVisible={hasShownFirstConversationHint && (!dialogues || dialogues.length === 0)}
-                    type="tip"
-                    title="Start Your Journey"
-                    description="Choose your first response to begin building a relationship with this character!"
-                    position="bottom"
-                    autoHide={true}
-                    delay={1500}
-                    onClose={() => setHasShownFirstConversationHint(false)}
                   />
                 </div>
               </CardContent>
