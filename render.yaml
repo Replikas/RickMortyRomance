@@ -1,20 +1,25 @@
+databases:
+  - name: rickortygame2-db
+    databaseName: rickortygame
+    user: rickortygame
+
 services:
   - type: web
     name: rickortygame2
     env: node
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: npm run dev
+    startCommand: npm start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rickortygame2-db
+          property: connectionString
     autoDeploy: true
     branch: main
     rootDir: .
-    disk:
-      name: rickortygame2-disk
-      size: 1GB
-      mountPath: /opt/render/project/src
