@@ -37,72 +37,76 @@ app.get('/api/characters', (req, res) => {
   ]);
 });
 
-// Serve static files
+// Serve built frontend files
+const fs = require('fs');
+const distPath = './dist';
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
+
+// Serve public assets
 app.use(express.static('public'));
 
-// Catch-all route
+// Catch-all route for SPA
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Rick and Morty Dating Simulator - Backend</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            color: #00ff88;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-          }
-          .container {
-            max-width: 600px;
-            padding: 40px;
-            border: 2px solid #00ff88;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.8);
-          }
-          h1 { color: #00ff88; margin-bottom: 20px; }
-          .status { color: #ffa500; margin: 20px 0; }
-          .api-link { color: #00aaff; text-decoration: none; }
-          .api-link:hover { text-decoration: underline; }
-          .success { color: #00ff88; }
-          .warning { color: #ffa500; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>🚀 Rick and Morty Dating Simulator</h1>
-          <div class="status success">✅ Backend Server Running Successfully!</div>
-          <p>The API server is operational and ready for connections.</p>
-          
-          <h3>Available Endpoints:</h3>
-          <p><a href="/api/health" class="api-link">/api/health</a> - Server health check</p>
-          <p><a href="/api/characters" class="api-link">/api/characters</a> - Character list</p>
-          
-          <h3>System Status:</h3>
-          <p>Environment: <span class="success">${process.env.NODE_ENV || 'production'}</span></p>
-          <p>Database: <span class="${process.env.DATABASE_URL ? 'success">✅ Connected' : 'warning">⚠️ Not configured'}</span></p>
-          <p>Port: <span class="success">${process.env.PORT || '5000'}</span></p>
-          
-          <div class="status">
-            Ready to serve frontend application when deployed together.
+  // Try to serve index.html for SPA routing
+  const indexPath = './dist/index.html';
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(require('path').resolve(indexPath));
+  } else {
+    // Fallback status page if no frontend build exists
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Rick and Morty Dating Simulator</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+              color: #00ff88;
+              margin: 0;
+              padding: 20px;
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+            }
+            .container {
+              max-width: 600px;
+              padding: 40px;
+              border: 2px solid #00ff88;
+              border-radius: 15px;
+              background: rgba(0, 0, 0, 0.8);
+            }
+            h1 { color: #00ff88; margin-bottom: 20px; }
+            .status { color: #ffa500; margin: 20px 0; }
+            .warning { color: #ffa500; }
+            .info { color: #00aaff; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Rick and Morty Dating Simulator</h1>
+            <div class="status warning">⚠️ Frontend Build Not Found</div>
+            <p class="info">The backend API is running, but the frontend needs to be built and deployed.</p>
+            <p>Backend Status: ✅ Running</p>
+            <p>Database: ${process.env.DATABASE_URL ? '✅ Connected' : '❌ Not configured'}</p>
+            <div class="status">
+              Run 'npm run build' to generate the frontend, then redeploy.
+            </div>
           </div>
-        </div>
-      </body>
-    </html>
-  `);
+        </body>
+      </html>
+    `);
+  }
 });
 
 // Error handling
