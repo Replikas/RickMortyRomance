@@ -54,7 +54,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     typingSpeed: "normal",
     nsfwContent: false,
     openrouterApiKey: "",
-    aiModel: "anthropic/claude-3-haiku"
+    aiModel: "deepseek/deepseek-chat-v3-0324:free"
   };
 
   const [settings, setSettings] = useState(defaultSettings);
@@ -260,11 +260,15 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B (Rick C-137)</SelectItem>
-                      <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini (Morty)</SelectItem>
-                      <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</SelectItem>
-                      <SelectItem value="anthropic/claude-3-sonnet">Claude 3 Sonnet (Balanced)</SelectItem>
-                      <SelectItem value="openai/gpt-4o">GPT-4o (Premium)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat v3 (Free)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-r1-0528:free">DeepSeek R1 0528 (Free)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</SelectItem>
+                      <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Free)</SelectItem>
+                      <SelectItem value="deepseek/deepseek-chat:free">DeepSeek Chat (Free)</SelectItem>
+                      <SelectItem value="google/gemma-3-27b-it:free">Gemma 3 27B (Free)</SelectItem>
+                      <SelectItem value="mistralai/mistral-nemo:free">Mistral Nemo (Free)</SelectItem>
+                      <SelectItem value="meta-llama/llama-4-maverick:free">Llama 4 Maverick (Free)</SelectItem>
+                      <SelectItem value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
