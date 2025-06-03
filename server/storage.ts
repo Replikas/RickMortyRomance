@@ -1,20 +1,10 @@
 import { 
-  users, 
-  characters, 
-  gameStates, 
-  dialogues, 
-  saveSlots,
-  type User, 
-  type Character, 
-  type GameState, 
-  type Dialogue, 
-  type SaveSlot,
-  type InsertUser, 
-  type InsertCharacter, 
-  type InsertGameState, 
-  type InsertDialogue, 
-  type InsertSaveSlot 
+  users, characters, gameStates, dialogues, saveSlots,
+  type User, type Character, type GameState, type Dialogue, type SaveSlot,
+  type InsertUser, type InsertCharacter, type InsertGameState, type InsertDialogue, type InsertSaveSlot
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -49,284 +39,207 @@ export interface IStorage {
   getUnlockedBackstories(gameStateId: number): Promise<string[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private characters: Map<number, Character> = new Map();
-  private gameStates: Map<number, GameState> = new Map();
-  private dialogues: Map<number, Dialogue[]> = new Map();
-  private saveSlots: Map<string, SaveSlot> = new Map();
-  private nextId = 1;
-
+export class DatabaseStorage implements IStorage {
   constructor() {
     this.initializeCharacters();
   }
 
-  private initializeCharacters() {
-    const rickCharacter: Character = {
-      id: this.nextId++,
+  private async initializeCharacters() {
+    // Check if characters already exist
+    const existingCharacters = await db.select().from(characters);
+    if (existingCharacters.length > 0) return;
+
+    // Create default characters
+    const rickCharacter: InsertCharacter = {
       name: "Rick Sanchez (C-137)",
-      description: "Genius scientist and interdimensional traveler with a cynical worldview and god complex.",
-      personality: "Rick is brilliant but arrogant, nihilistic yet protective of his family. He uses science and sarcasm as shields against emotional vulnerability. Despite his claims of not caring, he deeply loves his family but struggles to express it healthily.",
-      sprite: "/characters/rick.jpg",
-      color: "#00D4AA",
-      traits: ["genius", "cynical", "alcoholic", "protective", "emotionally_distant"],
-      emotionStates: ["neutral", "annoyed", "drunk", "excited", "angry", "vulnerable", "smug"],
+      description: "Genius scientist, interdimensional traveler, and definitely not someone you want to underestimate. Rick's cynical worldview masks a complex character capable of surprising depth.",
+      personality: "Brilliant, cynical, sarcastic, unpredictable, secretly caring but hides it behind layers of nihilism and alcohol",
+      sprite: "rick-c137",
+      color: "#00ff88",
+      traits: ["genius", "alcoholic", "inventor", "dimensional_traveler", "cynical"],
+      emotionStates: ["neutral", "drunk", "angry", "surprised", "smug", "concerned"]
     };
 
-    const mortyCharacter: Character = {
-      id: this.nextId++,
+    const mortyCharacter: InsertCharacter = {
       name: "Morty Smith",
-      description: "Rick's grandson, a nervous but good-hearted teenager who gets dragged into interdimensional adventures.",
-      personality: "Morty is anxious and insecure but has a strong moral compass. He's often overwhelmed by Rick's adventures but is growing more confident and assertive. He seeks approval while trying to do the right thing.",
-      sprite: "/characters/morty.jpg",
-      color: "#FFB800",
-      traits: ["anxious", "moral", "growing", "loyal", "insecure", "brave_when_needed"],
-      emotionStates: ["nervous", "excited", "scared", "determined", "happy", "confused", "angry"],
+      description: "Rick's grandson and reluctant adventure companion. Despite his nervousness and insecurity, Morty often shows unexpected courage and moral clarity.",
+      personality: "Nervous, insecure, morally grounded, often overwhelmed but surprisingly resilient, seeks approval",
+      sprite: "morty",
+      color: "#ffeb3b",
+      traits: ["anxious", "moral", "young", "inexperienced", "loyal"],
+      emotionStates: ["nervous", "excited", "confused", "determined", "scared", "happy"]
     };
 
-    const evilMortyCharacter: Character = {
-      id: this.nextId++,
+    const evilMortyCharacter: InsertCharacter = {
       name: "Evil Morty",
-      description: "A cold, calculating version of Morty who has transcended his naive nature through dark experiences.",
-      personality: "Evil Morty is manipulative, intelligent, and ruthlessly pragmatic. He's tired of being underestimated and has developed a cynical worldview that rivals Rick's. He values control and independence above all else.",
-      sprite: "/characters/evil-morty.png",
-      color: "#8B0000",
-      traits: ["manipulative", "intelligent", "cold", "calculating", "independent", "ruthless"],
-      emotionStates: ["cold", "calculating", "angry", "satisfied", "contemplative", "sinister", "disappointed"],
+      description: "The smartest and most dangerous Morty in the multiverse. Cold, calculating, and tired of being underestimated by Ricks everywhere.",
+      personality: "Calculating, intelligent, ruthless, ambitious, sees through Rick's manipulation, seeks independence",
+      sprite: "evil-morty",
+      color: "#ffd700",
+      traits: ["intelligent", "manipulative", "ambitious", "calculating", "independent"],
+      emotionStates: ["cold", "smug", "angry", "calculating", "satisfied", "contemplative"]
     };
 
-    const rickPrimeCharacter: Character = {
-      id: this.nextId++,
+    const rickPrimeCharacter: InsertCharacter = {
       name: "Rick Prime",
-      description: "The most dangerous Rick in the multiverse, who killed C-137 Rick's family and represents pure chaos.",
-      personality: "Rick Prime is the darkest version of Rick - completely without empathy or attachment. He's a force of pure destruction who finds joy in causing pain. He represents what Rick could become without any emotional connections.",
-      sprite: "/characters/RICKPRIME.webp",
-      color: "#FF0000",
-      traits: ["psychopathic", "destructive", "chaotic", "brilliant", "remorseless", "unpredictable"],
-      emotionStates: ["maniacal", "cold", "amused", "violent", "bored", "excited", "contemptuous"],
+      description: "The Rick who abandoned his family and killed other Ricks' wives. The most dangerous and nihilistic Rick in existence.",
+      personality: "Completely nihilistic, sadistic, brilliant, emotionally detached, sees all life as meaningless",
+      sprite: "rick-prime",
+      color: "#ff0066",
+      traits: ["nihilistic", "sadistic", "genius", "emotionless", "dangerous"],
+      emotionStates: ["cold", "amused", "bored", "irritated", "maniacal", "indifferent"]
     };
 
-    this.characters.set(rickCharacter.id, rickCharacter);
-    this.characters.set(mortyCharacter.id, mortyCharacter);
-    this.characters.set(evilMortyCharacter.id, evilMortyCharacter);
-    this.characters.set(rickPrimeCharacter.id, rickPrimeCharacter);
+    await db.insert(characters).values([rickCharacter, mortyCharacter, evilMortyCharacter, rickPrimeCharacter]);
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    for (const user of Array.from(this.users.values())) {
-      if (user.username === username) {
-        return user;
-      }
-    }
-    return undefined;
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const user: User = {
-      id: this.nextId++,
-      username: insertUser.username,
-      password: "",
-      email: null,
-      profilePicture: null,
-      createdAt: new Date()
-    };
-    this.users.set(user.id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const user = this.users.get(id);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    const updatedUser = { ...user, ...updates };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
   }
 
   async getAllCharacters(): Promise<Character[]> {
-    return Array.from(this.characters.values());
+    return await db.select().from(characters);
   }
 
   async getCharacter(id: number): Promise<Character | undefined> {
-    return this.characters.get(id);
+    const [character] = await db.select().from(characters).where(eq(characters.id, id));
+    return character || undefined;
   }
 
   async createCharacter(character: InsertCharacter): Promise<Character> {
-    const newCharacter: Character = {
-      id: this.nextId++,
-      ...character,
-    };
-    this.characters.set(newCharacter.id, newCharacter);
+    const [newCharacter] = await db
+      .insert(characters)
+      .values(character)
+      .returning();
     return newCharacter;
   }
 
   async getGameState(userId: number, characterId: number): Promise<GameState | undefined> {
-    for (const gameState of Array.from(this.gameStates.values())) {
-      if (gameState.userId === userId && gameState.characterId === characterId) {
-        return gameState;
-      }
-    }
-    return undefined;
+    const [gameState] = await db
+      .select()
+      .from(gameStates)
+      .where(and(eq(gameStates.userId, userId), eq(gameStates.characterId, characterId)));
+    return gameState || undefined;
   }
 
   async createGameState(gameState: InsertGameState): Promise<GameState> {
-    const now = new Date();
-    const newGameState: GameState = {
-      id: this.nextId++,
-      userId: gameState.userId,
-      characterId: gameState.characterId,
-      affectionLevel: gameState.affectionLevel ?? 0,
-      relationshipStatus: gameState.relationshipStatus ?? "stranger",
-      conversationCount: gameState.conversationCount ?? 0,
-      currentEmotion: gameState.currentEmotion ?? "neutral",
-      unlockedBackstories: gameState.unlockedBackstories ?? [],
-      lastSavedAt: gameState.lastSavedAt ?? null,
-      settings: gameState.settings ?? {
-        masterVolume: 70,
-        sfxVolume: 70,
-        musicVolume: 50,
-        animationSpeed: "normal",
-        particleEffects: true,
-        portalGlow: true,
-        autosaveFrequency: 5,
-        typingSpeed: "normal",
-        nsfwContent: false,
-        openrouterApiKey: "",
-        aiModel: "meta-llama/llama-3.1-8b-instruct"
-      },
-      createdAt: now,
-      updatedAt: now,
-    };
-    this.gameStates.set(newGameState.id, newGameState);
+    const [newGameState] = await db
+      .insert(gameStates)
+      .values(gameState)
+      .returning();
     return newGameState;
   }
 
   async updateGameState(id: number, updates: Partial<GameState>): Promise<GameState> {
-    const gameState = this.gameStates.get(id);
-    if (!gameState) {
-      throw new Error("Game state not found");
-    }
-    const updatedGameState = { 
-      ...gameState, 
-      ...updates, 
-      updatedAt: new Date() 
-    };
-    this.gameStates.set(id, updatedGameState);
-    return updatedGameState;
+    const [gameState] = await db
+      .update(gameStates)
+      .set(updates)
+      .where(eq(gameStates.id, id))
+      .returning();
+    return gameState;
   }
 
   async getUserGameStates(userId: number): Promise<GameState[]> {
-    const userGameStates = Array.from(this.gameStates.values())
-      .filter(gs => gs.userId === userId)
-      .sort((a, b) => {
-        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        return dateB - dateA;
-      });
-    return userGameStates;
+    return await db
+      .select()
+      .from(gameStates)
+      .where(eq(gameStates.userId, userId));
   }
 
   async getDialogues(gameStateId: number, limit = 50): Promise<Dialogue[]> {
-    const dialogueList = this.dialogues.get(gameStateId) || [];
-    return dialogueList
-      .sort((a, b) => {
-        const dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-        const dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-        return dateB - dateA;
-      })
-      .slice(0, limit);
+    return await db
+      .select()
+      .from(dialogues)
+      .where(eq(dialogues.gameStateId, gameStateId))
+      .orderBy(dialogues.timestamp)
+      .limit(limit);
   }
 
   async createDialogue(dialogue: InsertDialogue): Promise<Dialogue> {
-    const newDialogue: Dialogue = {
-      id: this.nextId++,
-      message: dialogue.message,
-      gameStateId: dialogue.gameStateId,
-      speaker: dialogue.speaker,
-      messageType: dialogue.messageType,
-      affectionChange: dialogue.affectionChange ?? null,
-      emotionTriggered: dialogue.emotionTriggered ?? null,
-      backstoryId: dialogue.backstoryId ?? null,
-      timestamp: new Date(),
-    };
-    
-    const existingDialogues = this.dialogues.get(dialogue.gameStateId) || [];
-    existingDialogues.push(newDialogue);
-    this.dialogues.set(dialogue.gameStateId, existingDialogues);
-    
+    const [newDialogue] = await db
+      .insert(dialogues)
+      .values(dialogue)
+      .returning();
     return newDialogue;
   }
 
   async getSaveSlots(userId: number): Promise<SaveSlot[]> {
-    const userSaveSlots = Array.from(this.saveSlots.values())
-      .filter(slot => slot.userId === userId)
-      .sort((a, b) => {
-        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        return dateB - dateA;
-      });
-    return userSaveSlots;
+    return await db
+      .select()
+      .from(saveSlots)
+      .where(eq(saveSlots.userId, userId));
   }
 
   async getSaveSlot(userId: number, slotNumber: number): Promise<SaveSlot | undefined> {
-    const key = `${userId}-${slotNumber}`;
-    return this.saveSlots.get(key);
+    const [saveSlot] = await db
+      .select()
+      .from(saveSlots)
+      .where(and(eq(saveSlots.userId, userId), eq(saveSlots.slotNumber, slotNumber)));
+    return saveSlot || undefined;
   }
 
   async createSaveSlot(saveSlot: InsertSaveSlot): Promise<SaveSlot> {
-    const now = new Date();
-    const newSaveSlot: SaveSlot = {
-      id: this.nextId++,
-      userId: saveSlot.userId,
-      slotNumber: saveSlot.slotNumber,
-      gameStateSnapshot: saveSlot.gameStateSnapshot,
-      dialogueCount: saveSlot.dialogueCount ?? 0,
-      characterName: saveSlot.characterName,
-      affectionLevel: saveSlot.affectionLevel ?? 0,
-      relationshipStatus: saveSlot.relationshipStatus ?? "stranger",
-      createdAt: now,
-      updatedAt: now,
-    };
-    
-    const key = `${newSaveSlot.userId}-${newSaveSlot.slotNumber}`;
-    this.saveSlots.set(key, newSaveSlot);
+    const [newSaveSlot] = await db
+      .insert(saveSlots)
+      .values(saveSlot)
+      .returning();
     return newSaveSlot;
   }
 
   async deleteSaveSlot(userId: number, slotNumber: number): Promise<void> {
-    const key = `${userId}-${slotNumber}`;
-    this.saveSlots.delete(key);
+    await db
+      .delete(saveSlots)
+      .where(and(eq(saveSlots.userId, userId), eq(saveSlots.slotNumber, slotNumber)));
   }
 
   async unlockBackstory(gameStateId: number, backstoryId: string): Promise<GameState> {
-    const gameState = this.gameStates.get(gameStateId);
+    const [gameState] = await db.select().from(gameStates).where(eq(gameStates.id, gameStateId));
     if (!gameState) {
       throw new Error("Game state not found");
     }
     
     const currentBackstories = gameState.unlockedBackstories || [];
     if (!currentBackstories.includes(backstoryId)) {
-      const updatedGameState = {
-        ...gameState,
-        unlockedBackstories: [...currentBackstories, backstoryId],
-        updatedAt: new Date(),
-      };
-      this.gameStates.set(gameStateId, updatedGameState);
+      const [updatedGameState] = await db
+        .update(gameStates)
+        .set({
+          unlockedBackstories: [...currentBackstories, backstoryId],
+          updatedAt: new Date(),
+        })
+        .where(eq(gameStates.id, gameStateId))
+        .returning();
       return updatedGameState;
     }
-    
     return gameState;
   }
 
   async getUnlockedBackstories(gameStateId: number): Promise<string[]> {
-    const gameState = this.gameStates.get(gameStateId);
+    const [gameState] = await db.select().from(gameStates).where(eq(gameStates.id, gameStateId));
     return gameState?.unlockedBackstories || [];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
