@@ -5,6 +5,14 @@ import { insertUserSchema, insertGameStateSchema, insertDialogueSchema } from "@
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for CodeCapsules
+  app.get("/api/health", (req: Request, res: Response) => {
+    res.status(200).json({ 
+      status: "healthy", 
+      timestamp: new Date().toISOString(),
+      service: "rick-morty-dating-simulator"
+    });
+  });
   // Health check endpoints for Render monitoring
   app.get("/health", (req, res) => {
     res.json({ 

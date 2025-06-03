@@ -1,0 +1,36 @@
+# CodeCapsules deployment configuration
+# This file configures your Rick and Morty Dating Simulator for deployment on CodeCapsules
+
+name: rick-morty-dating-simulator
+type: backend
+
+# Build configuration
+build:
+  commands:
+    - npm ci
+    - npm run build
+  
+# Runtime configuration
+run:
+  command: npm start
+  
+# Environment variables (set these in CodeCapsules dashboard)
+env:
+  NODE_ENV: production
+  PORT: $PORT
+  DATABASE_URL: $DATABASE_URL
+  
+# Health check
+health_check:
+  path: /api/health
+  port: $PORT
+  
+# Resource allocation
+resources:
+  cpu: 0.5
+  memory: 512MB
+  
+# Scaling
+scaling:
+  min_instances: 1
+  max_instances: 3
