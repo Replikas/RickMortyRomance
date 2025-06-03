@@ -257,8 +257,8 @@ server.on('error', (err) => {
   console.error('Server error:', err);
 });
 
-// Keep-alive system for Render stability
-if (process.env.NODE_ENV === 'production') {
+// Keep-alive system for Render stability - Enhanced version
+if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
   let keepAliveUrl = process.env.RENDER_EXTERNAL_URL;
   
   // Auto-detect render URL if not set
@@ -266,29 +266,47 @@ if (process.env.NODE_ENV === 'production') {
     keepAliveUrl = `https://${process.env.RENDER_SERVICE_NAME}.onrender.com`;
   }
   
-  if (keepAliveUrl) {
-    console.log('Setting up keep-alive for:', keepAliveUrl);
-    
-    // Initial ping after 30 seconds
-    setTimeout(() => {
-      setInterval(async () => {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000);
-          
-          const response = await fetch(`${keepAliveUrl}/api/health`, {
-            signal: controller.signal,
-            headers: { 'User-Agent': 'KeepAlive/1.0' }
-          });
-          
-          clearTimeout(timeoutId);
-          console.log(`Keep-alive: ${response.status} at ${new Date().toISOString()}`);
-        } catch (error) {
-          console.log('Keep-alive failed:', error.name);
-        }
-      }, 12 * 60 * 1000); // Every 12 minutes
-    }, 30000);
+  // Fallback for manual configuration
+  if (!keepAliveUrl) {
+    keepAliveUrl = 'https://rick-morty-dating-sim.onrender.com';
   }
+  
+  console.log('🔄 Setting up enhanced keep-alive system for:', keepAliveUrl);
+  
+  // Immediate first ping
+  const performKeepAlive = async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      
+      const response = await fetch(`${keepAliveUrl}/api/health`, {
+        signal: controller.signal,
+        headers: { 
+          'User-Agent': 'RenderKeepAlive/2.0',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      console.log(`✅ Keep-alive successful: ${response.status} at ${new Date().toISOString()}`);
+    } catch (error) {
+      console.log(`❌ Keep-alive failed: ${error.name} at ${new Date().toISOString()}`);
+    }
+  };
+  
+  // Initial ping after 10 seconds
+  setTimeout(performKeepAlive, 10000);
+  
+  // Regular pings every 10 minutes (more frequent to prevent sleep)
+  setInterval(performKeepAlive, 10 * 60 * 1000);
+  
+  // Additional ping every 5 minutes during peak hours (9 AM - 9 PM UTC)
+  setInterval(() => {
+    const hour = new Date().getUTCHours();
+    if (hour >= 9 && hour <= 21) {
+      setTimeout(performKeepAlive, 2000); // Slight delay to avoid conflicts
+    }
+  }, 5 * 60 * 1000);
 }
 
 // Memory optimization for Render

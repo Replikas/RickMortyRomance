@@ -3,16 +3,31 @@ services:
     name: rick-morty-dating-sim
     env: node
     buildCommand: npm run build
-    startCommand: node server/deploy.js
+    startCommand: node prevent-refresh.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: RENDER
+        value: true
+      - key: RENDER_OPTIMIZED
+        value: true
+      - key: VITE_DEV_MODE
+        value: false
+      - key: HMR_ENABLED
+        value: false
+      - key: WATCH_MODE
+        value: false
     healthCheckPath: /api/health
     numInstances: 1
     plan: free
     region: oregon
+    autoDeploy: false
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
     buildFilter:
       paths:
       - client/**
