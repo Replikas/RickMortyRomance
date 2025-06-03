@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npm run build && node server/railway-fixed.js"
+    "startCommand": "npm run build && node server/railway-minimal.cjs"
   }
 }
