@@ -2,7 +2,6 @@ node_modules
 npm-debug.log
 .git
 .gitignore
-README.md
 .env
 .nyc_output
 coverage
@@ -16,6 +15,7 @@ build
 .vercel
 .railway
 .replit
-attached_assets
 *.md
 !README.md
+# Keep attached_assets for portal and character images
+!attached_assets

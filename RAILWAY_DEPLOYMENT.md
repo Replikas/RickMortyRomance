@@ -38,11 +38,14 @@ After successful deployment:
 
 ## Troubleshooting Build Issues
 
-If the build fails with "exit code 240":
+✅ **Build Issue Fixed**: The Docker build has been updated to properly include your portal GIF and character assets.
+
+If you encounter any build issues:
 
 1. **Check Environment Variables**: Ensure `NODE_ENV` and `DATABASE_URL` are set correctly
 2. **Redeploy**: Go to Deployments → Click "Redeploy"
 3. **View Logs**: Click on the failed deployment to see detailed error logs
+4. **Assets Included**: Your authentic Rick and Morty portal animation and character images are now properly included in the build
 
 ## Expected Build Process
 Railway will:
