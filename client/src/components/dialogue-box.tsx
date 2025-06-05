@@ -65,15 +65,18 @@ export default function DialogueBox({
   useEffect(() => {
     const characterMessages = dialogues.filter(d => d.speaker === "character");
     
-    characterMessages.forEach(message => {
-      if (!displayedText[message.id]) {
-        setDisplayedText(prev => ({
-          ...prev,
-          [message.id]: message.message
-        }));
-      }
-    });
-  }, [dialogues]);
+    const newMessages = characterMessages.filter(message => !displayedText[message.id]);
+    
+    if (newMessages.length > 0) {
+      setDisplayedText(prev => {
+        const updates = {};
+        newMessages.forEach(message => {
+          updates[message.id] = message.message;
+        });
+        return { ...prev, ...updates };
+      });
+    }
+  }, [dialogues.length]); // Only depend on length to avoid excessive re-renders
 
   if (isLoading) {
     return (

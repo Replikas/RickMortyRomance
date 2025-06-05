@@ -47,11 +47,15 @@ export default function ChoiceButtons({ character, onChoiceSelect, disabled = fa
   const [choices, setChoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Generate new choices when character or conversation changes
+  // Generate new choices when character or conversation changes (debounced)
   useEffect(() => {
     if (!character) return;
     
-    generateChoices();
+    const debounceTimer = setTimeout(() => {
+      generateChoices();
+    }, 1000); // 1 second debounce
+    
+    return () => clearTimeout(debounceTimer);
   }, [character?.id, conversationHistory.length]);
 
   const generateChoices = async () => {

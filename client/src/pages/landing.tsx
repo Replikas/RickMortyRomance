@@ -133,7 +133,7 @@ export default function LandingPage({ onUserCreated }: LandingPageProps) {
       {/* Animated starry background */}
       <div className="absolute inset-0">
         {/* Stars field */}
-        {[...Array(150)].map((_, i) => (
+        {[...Array(20)].map((_, i) => (
           <motion.div
             key={`star-${i}`}
             className="absolute bg-white rounded-full shadow-sm"
@@ -157,7 +157,7 @@ export default function LandingPage({ onUserCreated }: LandingPageProps) {
         ))}
         
         {/* Shooting stars */}
-        {[...Array(3)].map((_, i) => (
+        {[...Array(1)].map((_, i) => (
           <motion.div
             key={`shooting-star-${i}`}
             className="absolute h-px bg-gradient-to-r from-transparent via-white to-transparent"
@@ -180,7 +180,7 @@ export default function LandingPage({ onUserCreated }: LandingPageProps) {
         ))}
         
         {/* Nebula effects */}
-        {[...Array(5)].map((_, i) => (
+        {[...Array(2)].map((_, i) => (
           <motion.div
             key={`nebula-${i}`}
             className="absolute rounded-full"
@@ -207,7 +207,7 @@ export default function LandingPage({ onUserCreated }: LandingPageProps) {
 
         
       {/* Floating energy particles */}
-      {[...Array(30)].map((_, i) => (
+      {[...Array(10)].map((_, i) => (
           <motion.div
             key={i}
             className={`absolute rounded-full ${

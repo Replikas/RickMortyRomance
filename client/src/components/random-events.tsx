@@ -80,10 +80,10 @@ export default function RandomEvents({ character, conversationHistory = [], last
   useEffect(() => {
     // Trigger random events occasionally - much less frequent
     const eventTimer = setInterval(() => {
-      if (Math.random() < 0.02 && !currentEvent && conversationHistory.length > 3) { // 2% chance only after some conversation
+      if (Math.random() < 0.01 && !currentEvent && conversationHistory.length > 3) { // 1% chance only after some conversation
         triggerContextualEvent();
       }
-    }, 180000); // Check every 3 minutes
+    }, 300000); // Check every 5 minutes
 
     return () => clearInterval(eventTimer);
   }, [character, currentEvent, conversationHistory.length]);
