@@ -66,7 +66,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background">
+    <div className="min-h-screen relative overflow-y-auto bg-background">
       {/* Portal Background Animation */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         {/* Starfield background effect */}

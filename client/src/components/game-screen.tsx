@@ -248,13 +248,13 @@ export default function GameScreen({ onBackToSelection }: GameScreenProps) {
 
   return (
     <motion.section 
-      className="py-2 px-2 sm:py-4 sm:px-4 min-h-screen overflow-hidden"
+      className="py-2 px-2 sm:py-4 sm:px-4 min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="max-w-4xl mx-auto h-full">
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2 sm:gap-3 h-full min-h-[calc(100vh-1rem)] max-h-screen">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-2 sm:gap-3 min-h-[calc(100vh-1rem)]">
           
           {/* Character Panel - Mobile: Top, Desktop: Left */}
           <motion.div 
